@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import {
   Box,
   Container,
@@ -11,13 +10,24 @@ import {
   FormControl,
   InputLabel,
   Button,
-  CircularProgress,
   InputAdornment,
   OutlinedInput,
+  Card,
+  CircularProgress,
+  CardContent,
+  IconButton,
+  Grid2,
 } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
+import {
+  Search as SearchIcon,
+  Favorite,
+  FavoriteBorder,
+  Bookmark,
+  BookmarkBorder,
+} from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
-import { Word } from '../types/Word';
+import { SearchResponse } from '../types/SearchResponse';
+import { WordGrid } from '../component/Word';
 
 const searchWords = async (
   token: string,
@@ -26,15 +36,18 @@ const searchWords = async (
   pageSize: number,
   languageId?: number,
 ) => {
-  const response = await axios.get('http://localhost:3001/word/search', {
-    headers: { Authorization: `Bearer ${token}` },
-    params: {
-      query,
-      pageNo,
-      pageSize,
-      ...(languageId !== undefined ? { languageId } : {}),
+  const response = await axios.get<SearchResponse>(
+    'http://localhost:3001/word/search',
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        query,
+        pageNo,
+        pageSize,
+        ...(languageId !== undefined ? { languageId } : {}),
+      },
     },
-  });
+  );
   return response.data;
 };
 
@@ -49,6 +62,8 @@ export default function Search() {
   const [languageId, setLanguageId] = useState<number | undefined>(undefined);
   const [pageNo, setPageNo] = useState(1);
   const pageSize = 10;
+  const [likedWords, setLikedWords] = useState({});
+  const [savedWords, setSavedWords] = useState({});
 
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['searchWords', query, pageNo, languageId],
@@ -61,16 +76,13 @@ export default function Search() {
     refetch();
   };
 
-  const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
-    setPageNo(value);
-    refetch();
+  const toggleLike = () => {
+    setLikedWords({});
   };
 
-  const columns: GridColDef[] = [
-    { field: 'name', headerName: 'Word', flex: 1 },
-    { field: 'meaning', headerName: 'Meaning', flex: 1 },
-    { field: 'englishMeaning', headerName: 'English Meaning', flex: 1 },
-  ];
+  const toggleSave = () => {
+    setSavedWords({});
+  };
 
   return (
     <Container sx={{ mt: 4, maxWidth: '900px', pb: 4 }}>
@@ -81,101 +93,139 @@ export default function Search() {
         Search Words
       </Typography>
 
-      <Box
-        display="flex"
-        alignItems="center"
-        gap={2}
-        mb={3}
+      <Card
         sx={{
-          backdropFilter: 'blur(12px)',
-          padding: '14px',
-          borderRadius: '14px',
-          boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.08)',
-          border: '1px solid rgba(255, 255, 255, 0.3)',
-        }}
-      >
-        <FormControl fullWidth variant="outlined">
-          <OutlinedInput
-            placeholder="Search for a word..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            startAdornment={
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            }
-            sx={{
-              borderRadius: '10px',
-            }}
-          />
-        </FormControl>
-
-        <FormControl sx={{ minWidth: 180 }}>
-          <InputLabel>Language</InputLabel>
-          <Select
-            value={languageId}
-            label="Language"
-            onChange={(e) =>
-              setLanguageId(
-                e.target.value === '' ? undefined : Number(e.target.value),
-              )
-            }
-          >
-            <MenuItem value={1}>Marathi</MenuItem>
-            <MenuItem value={2}>Hindi</MenuItem>
-            <MenuItem value={3}>English</MenuItem>
-          </Select>
-        </FormControl>
-
-        {/* Search Button */}
-        <Button
-          variant="contained"
-          onClick={handleSearch}
-          sx={{
-            minWidth: 130,
-            height: 46,
-            fontSize: '16px',
-            fontWeight: 'bold',
-            borderRadius: '10px',
-            textTransform: 'none',
-          }}
-        >
-          Search
-        </Button>
-      </Box>
-
-      <Box
-        sx={{
-          height: 450,
-          bgcolor: 'background.paper',
+          p: 3,
           borderRadius: 3,
-          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
-          padding: 2,
+          boxShadow: (theme) => (theme.palette.mode === 'dark' ? 6 : 3),
+          textAlign: 'center',
         }}
       >
-        {isFetching ? (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            height="100%"
+        <Box display="flex" alignItems="center" gap={2}>
+          <FormControl fullWidth variant="outlined">
+            <OutlinedInput
+              placeholder="Search for a word..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              startAdornment={
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: 'text.secondary' }} />
+                </InputAdornment>
+              }
+              sx={{
+                borderRadius: 2,
+                bgcolor: 'background.paper',
+                px: 1.5,
+              }}
+            />
+          </FormControl>
+
+          <FormControl sx={{ minWidth: 180 }}>
+            <InputLabel>Language</InputLabel>
+            <Select
+              value={languageId}
+              label="Language"
+              onChange={(e) =>
+                setLanguageId(
+                  e.target.value === '' ? undefined : Number(e.target.value),
+                )
+              }
+              sx={{
+                borderRadius: 2,
+                bgcolor: 'background.paper',
+              }}
+            >
+              <MenuItem>Select</MenuItem>
+              <MenuItem value={1}>Marathi</MenuItem>
+              <MenuItem value={2}>Hindi</MenuItem>
+              <MenuItem value={3}>English</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Button
+            variant="contained"
+            onClick={handleSearch}
+            sx={{
+              minWidth: 130,
+              height: 46,
+              fontSize: 16,
+              fontWeight: 'bold',
+              borderRadius: 2,
+              textTransform: 'none',
+            }}
           >
-            <CircularProgress />
-          </Box>
-        ) : (
-          <DataGrid
-            rows={data?.data || []}
-            columns={columns}
-            getRowId={(row) => row.id}
-            rowCount={data?.total || 0}
-            paginationModel={{ page: pageNo - 1, pageSize }}
-            onPaginationModelChange={(model) => setPageNo(model.page + 1)}
-            disableColumnFilter
-            disableDensitySelector
-            disableRowSelectionOnClick
-          />
-        )}
-      </Box>
+            Search
+          </Button>
+        </Box>
+      </Card>
+
+      {isFetching ? (
+        <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <>
+          <Grid2 container spacing={3} sx={{ mt: 4 }}>
+            {data?.data?.map((word) => (
+              <Grid2 key={word.id}>
+                <Card
+                  sx={{
+                    p: 2,
+                    borderRadius: 3,
+                    boxShadow: 3,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                  }}
+                >
+                  <CardContent>
+                    <Typography variant="h6" fontWeight="bold">
+                      {word.name}
+                    </Typography>
+                    <Typography color="text.secondary">
+                      {word.meaning}
+                    </Typography>
+                    <Typography
+                      variant="body2"
+                      sx={{ mt: 1 }}
+                      color="text.secondary"
+                    >
+                      {word.englishMeaning}
+                    </Typography>
+                  </CardContent>
+
+                  <Box sx={{ display: 'flex', gap: 1 }}>
+                    <IconButton onClick={() => toggleLike()} color="error">
+                      {
+                        /*likedWords[word.id]*/ true ? (
+                          <Favorite />
+                        ) : (
+                          <FavoriteBorder />
+                        )
+                      }
+                    </IconButton>
+                    <IconButton onClick={() => toggleSave()} color="primary">
+                      {
+                        /*savedWords[word.id]*/ true ? (
+                          <Bookmark />
+                        ) : (
+                          <BookmarkBorder />
+                        )
+                      }
+                    </IconButton>
+                  </Box>
+                </Card>
+              </Grid2>
+            ))}
+          </Grid2>
+        </>
+      )}
+      <WordGrid
+        words={data?.data || []}
+        toggleLike={toggleLike}
+        toggleSave={toggleSave}
+      ></WordGrid>
     </Container>
   );
 }
