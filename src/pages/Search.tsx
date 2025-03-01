@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import {
@@ -14,10 +14,9 @@ import {
   OutlinedInput,
   Card,
   CircularProgress,
+  Pagination,
 } from '@mui/material';
-import {
-  Search as SearchIcon
-} from '@mui/icons-material';
+import { Search as SearchIcon } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { SearchResponse } from '../types/SearchResponse';
 import { WordGrid } from '../component/Word';
@@ -27,8 +26,9 @@ const searchWords = async (
   query: string,
   pageNo: number,
   pageSize: number,
-  languageId?: number,
+  languageId?: number
 ) => {
+  console.log('Fetching Data - pageNo:', pageNo);
   const response = await axios.get<SearchResponse>(
     'http://localhost:3001/word/search',
     {
@@ -39,7 +39,7 @@ const searchWords = async (
         pageSize,
         ...(languageId !== undefined ? { languageId } : {}),
       },
-    },
+    }
   );
   return response.data;
 };
@@ -54,7 +54,7 @@ export default function Search() {
   const [query, setQuery] = useState('');
   const [languageId, setLanguageId] = useState<number | undefined>(undefined);
   const [pageNo, setPageNo] = useState(1);
-  const pageSize = 12;
+  const pageSize = 20;
   const [likedWords, setLikedWords] = useState({});
   const [savedWords, setSavedWords] = useState({});
 
@@ -64,11 +64,16 @@ export default function Search() {
     enabled: false,
   });
 
+  // Effect to refetch data when pageNo changes
+  useEffect(() => {
+    refetch();
+  }, [pageNo]); // Only runs when pageNo changes
+
   const handleSearch = () => {
+    console.log('handleSearch');
     setPageNo(1);
     refetch();
   };
-
   const toggleLike = () => {
     setLikedWords({});
   };
@@ -77,12 +82,14 @@ export default function Search() {
     setSavedWords({});
   };
 
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
+    console.log('handlePageChange', `newPage ${newPage}`);
+    setPageNo(newPage); // Updates state, which triggers refetch via useEffect
+  };
+
   return (
     <Container sx={{ mt: 4, pb: 4 }}>
-      <Typography
-        variant="h4"
-        sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center' }}
-      >
+      <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center' }}>
         Search Words
       </Typography>
 
@@ -119,14 +126,9 @@ export default function Search() {
               value={languageId}
               label="Language"
               onChange={(e) =>
-                setLanguageId(
-                  e.target.value === '' ? undefined : Number(e.target.value),
-                )
+                setLanguageId(e.target.value === '' ? undefined : Number(e.target.value))
               }
-              sx={{
-                borderRadius: 2,
-                bgcolor: 'background.paper',
-              }}
+              sx={{ borderRadius: 2, bgcolor: 'background.paper' }}
             >
               <MenuItem>Select</MenuItem>
               <MenuItem value={1}>Marathi</MenuItem>
@@ -166,6 +168,17 @@ export default function Search() {
         </Box>
       )}
 
+      {data?.total && (
+        <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
+          <Pagination
+            count={Math.ceil(data.total / pageSize) || 1}
+            page={pageNo}
+            onChange={handlePageChange}
+            color="primary"
+            size="large"
+          />
+        </Box>
+      )}
     </Container>
   );
 }
