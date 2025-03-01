@@ -16,9 +16,11 @@
   },
   "plugins": ["react"],
   "rules": {
-    "react/react-in-jsx-scope": "off",
-    "no-constant-condition": "off",
     "react/prop-types": "off",
+    "react/react-in-jsx-scope": "off",
+    "no-constant-condition": "warn",
+    "no-unused-vars": "warn",
+    "no-undef": "warn",
     "quotes": ["error", "single"],
     "indent": ["error", 2],
     "semi": ["error", "always"]

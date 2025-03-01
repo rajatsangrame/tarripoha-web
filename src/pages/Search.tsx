@@ -14,16 +14,9 @@ import {
   OutlinedInput,
   Card,
   CircularProgress,
-  CardContent,
-  IconButton,
-  Grid2,
 } from '@mui/material';
 import {
-  Search as SearchIcon,
-  Favorite,
-  FavoriteBorder,
-  Bookmark,
-  BookmarkBorder,
+  Search as SearchIcon
 } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { SearchResponse } from '../types/SearchResponse';
@@ -164,68 +157,15 @@ export default function Search() {
           <CircularProgress />
         </Box>
       ) : (
-        <>
-          <Grid2 container spacing={3} sx={{ mt: 4 }}>
-            {data?.data?.map((word) => (
-              <Grid2 key={word.id}>
-                <Card
-                  sx={{
-                    p: 2,
-                    borderRadius: 3,
-                    boxShadow: 3,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    textAlign: 'center',
-                  }}
-                >
-                  <CardContent>
-                    <Typography variant="h6" fontWeight="bold">
-                      {word.name}
-                    </Typography>
-                    <Typography color="text.secondary">
-                      {word.meaning}
-                    </Typography>
-                    <Typography
-                      variant="body2"
-                      sx={{ mt: 1 }}
-                      color="text.secondary"
-                    >
-                      {word.englishMeaning}
-                    </Typography>
-                  </CardContent>
-
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <IconButton onClick={() => toggleLike()} color="error">
-                      {
-                        /*likedWords[word.id]*/ true ? (
-                          <Favorite />
-                        ) : (
-                          <FavoriteBorder />
-                        )
-                      }
-                    </IconButton>
-                    <IconButton onClick={() => toggleSave()} color="primary">
-                      {
-                        /*savedWords[word.id]*/ true ? (
-                          <Bookmark />
-                        ) : (
-                          <BookmarkBorder />
-                        )
-                      }
-                    </IconButton>
-                  </Box>
-                </Card>
-              </Grid2>
-            ))}
-          </Grid2>
-        </>
+        <Box display="flex" sx={{ mt: 3 }}>
+          <WordGrid
+            words={data?.data || []}
+            toggleLike={toggleLike}
+            toggleSave={toggleSave}
+          ></WordGrid>
+        </Box>
       )}
-      <WordGrid
-        words={data?.data || []}
-        toggleLike={toggleLike}
-        toggleSave={toggleSave}
-      ></WordGrid>
+
     </Container>
   );
 }
