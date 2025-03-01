@@ -76,7 +76,16 @@ export default function Search() {
     setSavedWords({});
   };
 
+  /**
+   * This will only get trigger when user hits search button.
+   * We simply set the pageNo and refetch() will trigger from useEffect.
+   * If the page no already 1. We force refresh as setPageNo(1) will have no effect.
+   */
   const handleSearch = () => {
+    if (pageNo === 1) {
+      refetch();
+      return;
+    }
     setPageNo(1);
   };
 
@@ -151,21 +160,30 @@ export default function Search() {
         </Box>
       </Card>
 
-      {isFetching ? (
+      {isFetching && (
         <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
           <CircularProgress />
         </Box>
-      ) : (
+      )}
+
+      {!isFetching && (
         <Box sx={{ flexGrow: 1, mt: 3 }} display="flex" width='100%'>
           <WordGrid
             words={data?.data || []}
             toggleLike={toggleLike}
             toggleSave={toggleSave}
           ></WordGrid>
+
+          {data?.total === 0 && (
+            <Box display="flex" justifyContent="center" width="100%" sx={{ mt: 3 }}>
+              <Typography sx={{ color: 'text.secondary' }}>
+                No results found
+              </Typography>
+            </Box>
+          )}
         </Box>
       )}
-
-      {data?.total && (
+      {data?.total !== undefined && data.total > 0 && (
         <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
           <Pagination
             count={Math.ceil(data.total / pageSize) || 1}
