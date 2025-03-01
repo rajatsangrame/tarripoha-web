@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 interface DialogState {
   open: boolean;
@@ -11,8 +11,8 @@ interface DialogState {
 
 export const useDialogStore = create<DialogState>((set) => ({
   open: false,
-  title: "",
-  message: "",
+  title: '',
+  message: '',
   onConfirm: () => {
     // no-op
   },

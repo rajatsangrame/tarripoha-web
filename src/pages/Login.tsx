@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Button,
   TextField,
@@ -7,14 +7,14 @@ import {
   Card,
   CircularProgress,
   useTheme
-} from "@mui/material";
-import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { useSnackbarStore } from "../store/snackbarStore";
+} from '@mui/material';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { useSnackbarStore } from '../store/snackbarStore';
 
 export default function Login() {
-  const [credentials, setCredentials] = useState({ username: "", password: "" });
-  const [error, setError] = useState("");
+  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -27,21 +27,21 @@ export default function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
+    setError('');
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:3001/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('http://localhost:3001/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials),
       });
-      if (!response.ok) throw new Error("Invalid login credentials");
+      if (!response.ok) throw new Error('Invalid login credentials');
 
       const data = await response.json();
       login(data.accessToken);
-      navigate("/home", { replace: true });
-      showSnackbar("Logged in successfully!");
+      navigate('/home', { replace: true });
+      showSnackbar('Logged in successfully!');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -61,9 +61,9 @@ export default function Login() {
         sx={{
           padding: 4,
           borderRadius: 3,
-          boxShadow: theme.palette.mode === "dark" ? 6 : 3,
+          boxShadow: theme.palette.mode === 'dark' ? 6 : 3,
           width: 350,
-          textAlign: "center",
+          textAlign: 'center',
         }}
       >
         <Typography
@@ -72,7 +72,7 @@ export default function Login() {
           color="primary"
           mb={2}
           sx={{
-            textShadow: theme.palette.mode === "dark" ? "0px 0px 10px rgba(255,255,255,0.2)" : "none"
+            textShadow: theme.palette.mode === 'dark' ? '0px 0px 10px rgba(255,255,255,0.2)' : 'none'
           }}
         >
           Login
@@ -112,16 +112,16 @@ export default function Login() {
             sx={{
               mt: 2,
               py: 1,
-              fontSize: "1rem",
+              fontSize: '1rem',
               borderRadius: 2,
-              transition: "0.3s ease-in-out",
-              "&:hover": {
-                transform: "scale(1.05)",
+              transition: '0.3s ease-in-out',
+              '&:hover': {
+                transform: 'scale(1.05)',
               },
             }}
             disabled={loading}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : "Login"}
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Login'}
           </Button>
         </Box>
       </Card>

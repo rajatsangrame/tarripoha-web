@@ -1,10 +1,10 @@
-import { Container } from "@mui/material";
-import { Routes, Route } from "react-router-dom";
-import DrawerHeader from "./DrawerHeader";
-import Home from "../pages/Home";
-import Search from "../pages/Search";
-import Login from "../pages/Login";
-import Saved from "../pages/Saved";
+import { Container } from '@mui/material';
+import { Routes, Route } from 'react-router-dom';
+import DrawerHeader from './DrawerHeader';
+import Home from '../pages/Home';
+import Search from '../pages/Search';
+import Login from '../pages/Login';
+import Saved from '../pages/Saved';
 
 const MainContainer: React.FC = () => {
 

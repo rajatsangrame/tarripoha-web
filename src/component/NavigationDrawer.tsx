@@ -1,15 +1,15 @@
-import React from "react";
-import { Drawer, List, ListItem, ListItemText, ListItemButton, ListItemIcon, Box } from "@mui/material";
-import HomeIcon from "@mui/icons-material/Home";
-import BookmarksIcon from "@mui/icons-material/Bookmarks";
-import SearchIcon from "@mui/icons-material/Search";
-import { Link, useLocation } from "react-router-dom";
-import DrawerHeader from "./DrawerHeader";
+import React from 'react';
+import { Drawer, List, ListItem, ListItemText, ListItemButton, ListItemIcon, Box } from '@mui/material';
+import HomeIcon from '@mui/icons-material/Home';
+import BookmarksIcon from '@mui/icons-material/Bookmarks';
+import SearchIcon from '@mui/icons-material/Search';
+import { Link, useLocation } from 'react-router-dom';
+import DrawerHeader from './DrawerHeader';
 
 const menuItems = [
-  { text: "Home", icon: <HomeIcon />, path: "/home" },
-  { text: "Search", icon: <SearchIcon />, path: "/search" },
-  { text: "Saved", icon: <BookmarksIcon />, path: "/saved" },
+  { text: 'Home', icon: <HomeIcon />, path: '/home' },
+  { text: 'Search', icon: <SearchIcon />, path: '/search' },
+  { text: 'Saved', icon: <BookmarksIcon />, path: '/saved' },
 ];
 
 interface NavigationDrawerProps {
@@ -27,10 +27,10 @@ const NavigationDrawer: React.FC<NavigationDrawerProps> = ({ drawerOpen, drawerW
         sx={{
           width: drawerOpen ? drawerWidthExpanded : drawerWidthCollapsed,
           flexShrink: 0,
-          transition: "width 0.3s ease",
-          "& .MuiDrawer-paper": {
+          transition: 'width 0.3s ease',
+          '& .MuiDrawer-paper': {
             width: drawerOpen ? drawerWidthExpanded : drawerWidthCollapsed,
-            transition: "width 0.3s ease",
+            transition: 'width 0.3s ease',
           },
         }}>
         <DrawerHeader />
@@ -39,7 +39,7 @@ const NavigationDrawer: React.FC<NavigationDrawerProps> = ({ drawerOpen, drawerW
             const isActive = location.pathname === item.path;
 
             return (
-              <ListItem disablePadding>
+              <ListItem key={'menu-item'} disablePadding>
                 <ListItemButton
                   component={Link}
                   to={item.path}

@@ -1,5 +1,5 @@
-import { Language } from "./Language";
-import { User } from "./User";
+import { Language } from './Language';
+import { User } from './User';
 
 export interface Word {
     id: number;
