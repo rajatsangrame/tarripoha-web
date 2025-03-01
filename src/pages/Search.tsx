@@ -24,11 +24,11 @@ import { WordGrid } from '../component/Word';
 const searchWords = async (
   token: string,
   query: string,
-  pageNo: number,
   pageSize: number,
+  pageNo?: number,
   languageId?: number
 ) => {
-  console.log('Fetching Data - pageNo:', pageNo);
+  if (!pageNo) return;
   const response = await axios.get<SearchResponse>(
     'http://localhost:3001/word/search',
     {
@@ -53,27 +53,21 @@ export default function Search() {
 
   const [query, setQuery] = useState('');
   const [languageId, setLanguageId] = useState<number | undefined>(undefined);
-  const [pageNo, setPageNo] = useState(1);
+  const [pageNo, setPageNo] = useState<number | undefined>(undefined);
   const pageSize = 20;
   const [likedWords, setLikedWords] = useState({});
   const [savedWords, setSavedWords] = useState({});
 
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['searchWords', query, pageNo, languageId],
-    queryFn: () => searchWords(token, query, pageNo, pageSize, languageId),
+    queryFn: () => searchWords(token, query, pageSize, pageNo, languageId),
     enabled: false,
   });
 
-  // Effect to refetch data when pageNo changes
   useEffect(() => {
     refetch();
-  }, [pageNo]); // Only runs when pageNo changes
+  }, [pageNo]);
 
-  const handleSearch = () => {
-    console.log('handleSearch');
-    setPageNo(1);
-    refetch();
-  };
   const toggleLike = () => {
     setLikedWords({});
   };
@@ -82,9 +76,12 @@ export default function Search() {
     setSavedWords({});
   };
 
+  const handleSearch = () => {
+    setPageNo(1);
+  };
+
   const handlePageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
-    console.log('handlePageChange', `newPage ${newPage}`);
-    setPageNo(newPage); // Updates state, which triggers refetch via useEffect
+    setPageNo(newPage);
   };
 
   return (

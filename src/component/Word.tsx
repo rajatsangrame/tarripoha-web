@@ -5,6 +5,7 @@ import {
   FavoriteBorder,
   Bookmark,
   BookmarkBorder,
+  Share,
 } from '@mui/icons-material';
 import { Word } from '../types/Word';
 
@@ -14,37 +15,75 @@ interface WordCardProps {
   toggleSave: (id: number) => void;
 }
 
+const getLanguageSymbol = (languageId?: number) => {
+  if (languageId === 1) return 'म';
+  if (languageId === 2) return 'हिं';
+  return null;
+};
+
 const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave }) => {
   return (
     <Card
       sx={{
         width: 250,
+        height: 180,
         p: 2,
         borderRadius: 3,
         boxShadow: 3,
         display: 'flex',
         flexDirection: 'column',
+        position: 'relative',
         textAlign: 'left',
-      }}
-    >
-      <CardContent sx={{ flexGrow: 1 }}>
+      }}>
+      {word.languageId && (
+        <Box
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            backgroundColor: 'lightgray',
+            color: 'black',
+            px: 1,
+            py: 0.5,
+            borderRadius: 1,
+            fontSize: 14,
+            fontWeight: 'bold',
+          }}
+        >
+          {getLanguageSymbol(word.languageId)}
+        </Box>
+      )}
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: 8,
+          right: 8,
+          display: 'flex',
+          gap: 1,
+        }}
+      >
+        <IconButton onClick={() => toggleLike(word.id)} color="error" size="small">
+          {false ? <Favorite /> : <FavoriteBorder />}
+        </IconButton>
+        <IconButton onClick={() => toggleSave(word.id)} color="primary" size="small">
+          {false ? <Bookmark /> : <BookmarkBorder />}
+        </IconButton>
+        <IconButton color="default" size="small">
+          <Share />
+        </IconButton>
+      </Box>
+
+      <CardContent sx={{ flexGrow: 1, overflow: 'hidden' }}>
         <Typography variant="h6" fontWeight="bold">
           {word.name}
         </Typography>
         <Typography color="text.secondary">{word.meaning}</Typography>
-        <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
-          {word.englishMeaning}
-        </Typography>
+        {word.englishMeaning && (
+          <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
+            {word.englishMeaning}
+          </Typography>
+        )}
       </CardContent>
-
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
-        <IconButton onClick={() => toggleLike(word.id)} color="error">
-          {true ? <Favorite /> : <FavoriteBorder />}
-        </IconButton>
-        <IconButton onClick={() => toggleSave(word.id)} color="primary">
-          {true ? <Bookmark /> : <BookmarkBorder />}
-        </IconButton>
-      </Box>
     </Card>
   );
 };
