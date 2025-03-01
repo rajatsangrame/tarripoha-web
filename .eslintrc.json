@@ -23,6 +23,8 @@
     "no-undef": "warn",
     "quotes": ["error", "single"],
     "indent": ["error", 2],
-    "semi": ["error", "always"]
+    "semi": ["error", "always"],
+    "no-extra-semi": "error",
+    "no-multiple-empty-lines": ["error", { "max": 1, "maxEOF": 0, "maxBOF": 0 }]
   }
 }

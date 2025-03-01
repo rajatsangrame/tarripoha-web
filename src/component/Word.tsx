@@ -1,6 +1,5 @@
-import Grid2 from '@mui/material/Grid2';
 import React from 'react';
-import { Card, CardContent, Typography, Box, IconButton } from '@mui/material';
+import { Grid2 as Grid, Card, CardContent, Typography, Box, IconButton } from '@mui/material';
 import {
   Favorite,
   FavoriteBorder,
@@ -57,14 +56,15 @@ interface WordGridProps {
 }
 
 const WordGrid: React.FC<WordGridProps> = ({ words, toggleLike, toggleSave }) => {
+
   return (
-    <Grid2 container gap={4} alignItems="stretch">
+    <Grid container justifyContent="center" rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>
       {words?.map((word) => (
-        <Grid2 key={word.id} sx={{ width: 250 }}>
+        <Grid key={word.id} sx={{ width: '250px' }}>
           <WordCard word={word} toggleLike={toggleLike} toggleSave={toggleSave} />
-        </Grid2>
+        </Grid>
       ))}
-    </Grid2>
+    </Grid>
   );
 };
 

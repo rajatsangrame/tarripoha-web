@@ -78,7 +78,7 @@ export default function Search() {
   };
 
   return (
-    <Container sx={{ mt: 4, maxWidth: '900px', pb: 4 }}>
+    <Container sx={{ mt: 4, pb: 4 }}>
       <Typography
         variant="h4"
         sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center' }}
@@ -157,7 +157,7 @@ export default function Search() {
           <CircularProgress />
         </Box>
       ) : (
-        <Box display="flex" width='100%' sx={{ mt: 3 }}>
+        <Box sx={{ flexGrow: 1, mt: 3 }} display="flex" width='100%'>
           <WordGrid
             words={data?.data || []}
             toggleLike={toggleLike}
