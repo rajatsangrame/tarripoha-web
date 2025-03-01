@@ -15,21 +15,16 @@ interface WordCardProps {
   toggleSave: (id: number) => void;
 }
 
-const WordCard: React.FC<WordCardProps> = ({
-  word,
-  toggleLike,
-  toggleSave,
-}) => {
+const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave }) => {
   return (
     <Card
       sx={{
-        width: '100%',
+        width: 250,
         p: 2,
         borderRadius: 3,
         boxShadow: 3,
         display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: 'column',
         textAlign: 'left',
       }}
     >
@@ -43,7 +38,7 @@ const WordCard: React.FC<WordCardProps> = ({
         </Typography>
       </CardContent>
 
-      <Box sx={{ display: 'flex', gap: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
         <IconButton onClick={() => toggleLike(word.id)} color="error">
           {true ? <Favorite /> : <FavoriteBorder />}
         </IconButton>
@@ -63,9 +58,9 @@ interface WordGridProps {
 
 const WordGrid: React.FC<WordGridProps> = ({ words, toggleLike, toggleSave }) => {
   return (
-    <Grid2 container spacing={2} justifyContent="center">
+    <Grid2 container gap={4} alignItems="stretch">
       {words?.map((word) => (
-        <Grid2 key={word.id} sx={{ width: 300 }}>
+        <Grid2 key={word.id} sx={{ width: 250 }}>
           <WordCard word={word} toggleLike={toggleLike} toggleSave={toggleSave} />
         </Grid2>
       ))}

@@ -54,7 +54,7 @@ export default function Search() {
   const [query, setQuery] = useState('');
   const [languageId, setLanguageId] = useState<number | undefined>(undefined);
   const [pageNo, setPageNo] = useState(1);
-  const pageSize = 10;
+  const pageSize = 12;
   const [likedWords, setLikedWords] = useState({});
   const [savedWords, setSavedWords] = useState({});
 
@@ -157,7 +157,7 @@ export default function Search() {
           <CircularProgress />
         </Box>
       ) : (
-        <Box display="flex" sx={{ mt: 3 }}>
+        <Box display="flex" width='100%' sx={{ mt: 3 }}>
           <WordGrid
             words={data?.data || []}
             toggleLike={toggleLike}
