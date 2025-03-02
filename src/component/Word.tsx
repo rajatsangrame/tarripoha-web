@@ -11,8 +11,8 @@ import { Word } from '../types/Word';
 
 interface WordCardProps {
   word: Word;
-  toggleLike: (id: number) => void;
-  toggleSave: (id: number) => void;
+  toggleLike: (word: Word) => void;
+  toggleSave: (word: Word) => void;
 }
 
 const getLanguageSymbol = (languageId?: number) => {
@@ -62,10 +62,10 @@ const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave }) => 
           gap: 1,
         }}
       >
-        <IconButton onClick={() => toggleLike(word.id)} color="error" size="small">
+        <IconButton onClick={() => toggleLike(word)} color="error" size="small">
           {word.isLiked ? <Favorite /> : <FavoriteBorder />}
         </IconButton>
-        <IconButton onClick={() => toggleSave(word.id)} color="primary" size="small">
+        <IconButton onClick={() => toggleSave(word)} color="primary" size="small">
           {word.isSaved ? <Bookmark /> : <BookmarkBorder />}
         </IconButton>
         <IconButton color="default" size="small">
@@ -90,8 +90,8 @@ const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave }) => 
 
 interface WordGridProps {
   words: Word[];
-  toggleLike: (id: number) => void;
-  toggleSave: (id: number) => void;
+  toggleLike: (word: Word) => void;
+  toggleSave: (word: Word) => void;
 }
 
 const WordGrid: React.FC<WordGridProps> = ({ words, toggleLike, toggleSave }) => {

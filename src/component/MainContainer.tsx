@@ -5,6 +5,7 @@ import Home from '../pages/Home';
 import Search from '../pages/Search';
 import Login from '../pages/Login';
 import Saved from '../pages/Saved';
+import React from 'react';
 
 const MainContainer: React.FC = () => {
 

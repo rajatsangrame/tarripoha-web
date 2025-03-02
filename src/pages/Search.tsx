@@ -20,6 +20,9 @@ import { Search as SearchIcon } from '@mui/icons-material';
 import { useAuth } from '../context/AuthContext';
 import { SearchResponse } from '../types/SearchResponse';
 import { WordGrid } from '../component/Word';
+import { Word } from '../types/Word';
+import { useSnackbarStore } from '../store/snackbarStore';
+import RequireLogin from '../component/RequireLogin';
 
 const searchWords = async (
   token: string,
@@ -44,23 +47,26 @@ const searchWords = async (
   return response.data;
 };
 
-export default function Search() {
+const getUserTokenOrShowError = () => {
   const { getToken } = useAuth();
-  const token = getToken();
-  if (!token) {
-    throw new Error('No token found');
-  }
+  const authToken = getToken();
+  if (!authToken) return '';
+  return authToken;
+};
+
+export default function Search() {
+
+  const authToken = getUserTokenOrShowError();
+  if (!authToken) return <RequireLogin />;
 
   const [query, setQuery] = useState('');
   const [languageId, setLanguageId] = useState<number | undefined>(undefined);
   const [pageNo, setPageNo] = useState<number | undefined>(undefined);
   const pageSize = 20;
-  const [likedWords, setLikedWords] = useState({});
-  const [savedWords, setSavedWords] = useState({});
 
   const { data, refetch, isFetching } = useQuery({
     queryKey: ['searchWords', query, pageNo, languageId],
-    queryFn: () => searchWords(token, query, pageSize, pageNo, languageId),
+    queryFn: () => searchWords(authToken, query, pageSize, pageNo, languageId),
     enabled: false,
   });
 
@@ -68,12 +74,51 @@ export default function Search() {
     refetch();
   }, [pageNo]);
 
-  const toggleLike = () => {
-    setLikedWords({});
+  const toggleLike = async (word: Word) => {
+    try {
+
+      const newSaveStatus = !word.isLiked;
+      await axios.post(
+        'http://localhost:3001/like/insert-like',
+        {
+          contentId: word.id,
+          contentType: 1,
+          isActive: newSaveStatus,
+        },
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+
+      refetch();
+    } catch (error) {
+      showSnackbar('Fail to update', 'error');
+    }
   };
 
-  const toggleSave = () => {
-    setSavedWords({});
+  const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
+
+  const toggleSave = async (word: Word) => {
+    try {
+
+      const newSaveStatus = !word.isSaved;
+      await axios.post(
+        'http://localhost:3001/saved/insert-saved',
+        {
+          contentId: word.id,
+          contentType: 1,
+          isActive: newSaveStatus,
+        },
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+
+      showSnackbar('Updated Saved!');
+      refetch();
+    } catch (error) {
+      showSnackbar('Fail update the save', 'error');
+    }
   };
 
   /**
