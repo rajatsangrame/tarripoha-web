@@ -11,7 +11,9 @@ import { Word } from '../types/Word';
 
 interface WordCardProps {
   word: Word;
+  // eslint-disable-next-line no-unused-vars
   toggleLike: (word: Word) => void;
+  // eslint-disable-next-line no-unused-vars
   toggleSave: (word: Word) => void;
 }
 
@@ -90,7 +92,9 @@ const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave }) => 
 
 interface WordGridProps {
   words: Word[];
+  // eslint-disable-next-line no-unused-vars
   toggleLike: (word: Word) => void;
+  // eslint-disable-next-line no-unused-vars
   toggleSave: (word: Word) => void;
 }
 
