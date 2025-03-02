@@ -6,4 +6,3 @@ export interface SearchResponse {
   'pageSize': number,
   data: Word[]
 }
-

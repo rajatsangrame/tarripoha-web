@@ -63,10 +63,10 @@ const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave }) => 
         }}
       >
         <IconButton onClick={() => toggleLike(word.id)} color="error" size="small">
-          {false ? <Favorite /> : <FavoriteBorder />}
+          {word.isLiked ? <Favorite /> : <FavoriteBorder />}
         </IconButton>
         <IconButton onClick={() => toggleSave(word.id)} color="primary" size="small">
-          {false ? <Bookmark /> : <BookmarkBorder />}
+          {word.isSaved ? <Bookmark /> : <BookmarkBorder />}
         </IconButton>
         <IconButton color="default" size="small">
           <Share />
