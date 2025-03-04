@@ -6,12 +6,14 @@ import { useAuth } from '../context/AuthContext';
 import { Link } from 'react-router-dom';
 import { useDialogStore } from '../store/dialogStore';
 import { useSnackbarStore } from '../store/snackbarStore';
+import { useNavigate } from 'react-router-dom';
 
 export default function ToolbarAccount() {
   const showDialog = useDialogStore((state) => state.showDialog);
   const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
+  const navigate = useNavigate();
 
-  const { user, logout } = useAuth();
+  const { getUser, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -21,6 +23,8 @@ export default function ToolbarAccount() {
   const handleMenuClose = () => {
     setAnchorEl(null);
   };
+
+  const user = getUser();
 
   return user ? (
     <>
@@ -65,6 +69,7 @@ export default function ToolbarAccount() {
               () => {
                 logout();
                 showSnackbar('Logged out successfully!');
+                navigate('/login');
               }
             );
             handleMenuClose();

@@ -1,10 +1,11 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext } from 'react';
 import { jwtDecode } from 'jwt-decode';
 
 type AuthContextType = {
-  user: User | null;
-  login: (token: string) => void;
+  // eslint-disable-next-line
+  login: (token: string) => User;
   logout: () => void;
+  getUser: () => User | null;
   getToken: () => string | null;
 };
 
@@ -18,30 +19,33 @@ type User = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
 
   const login = (token: string) => {
-    sessionStorage.setItem('jwt_token', token);
-    const decoded: any = jwtDecode(token);
-    setUser({
+    localStorage.setItem('jwt_token', token);
+    const decoded: User = jwtDecode(token);
+    return {
       username: decoded.username,
       firstName: decoded.firstName,
       lastName: decoded.lastName,
       email: decoded.email
-    } as User);
+    } as User;
+  };
+
+  const getUser = () => {
+    const token = localStorage.getItem('jwt_token');
+    return token ? jwtDecode(token) as User : null;
   };
 
   const logout = () => {
-    sessionStorage.removeItem('jwt_token');
-    setUser(null);
+    localStorage.removeItem('jwt_token');
   };
 
   const getToken = () => {
-    const token = sessionStorage.getItem('jwt_token');
+    const token = localStorage.getItem('jwt_token');
     return token;
   };
 
-  return <AuthContext.Provider value={{ user, login, logout, getToken }}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ getUser, login, logout, getToken }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
