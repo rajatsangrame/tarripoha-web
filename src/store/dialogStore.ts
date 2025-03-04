@@ -5,6 +5,7 @@ interface DialogState {
   title: string;
   message: string;
   onConfirm: () => void;
+  // eslint-disable-next-line no-unused-vars
   showDialog: (title: string, message: string, onConfirm: () => void) => void;
   closeDialog: () => void;
 }

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Grid2 as Grid, Card, CardContent, Typography, Box, IconButton } from '@mui/material';
+import { Box, Card, CardContent, Grid2 as Grid, IconButton, Typography } from '@mui/material';
 import {
-  Favorite,
-  FavoriteBorder,
   Bookmark,
   BookmarkBorder,
+  Favorite,
+  FavoriteBorder,
   Share,
 } from '@mui/icons-material';
 import { Word } from '../types/Word';

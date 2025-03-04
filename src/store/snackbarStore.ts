@@ -4,6 +4,7 @@ type SnackbarState = {
   open: boolean;
   message: string;
   severity: 'success' | 'error' | 'warning' | 'info';
+  // eslint-disable-next-line no-unused-vars
   showSnackbar: (message: string, severity?: 'success' | 'error' | 'warning' | 'info') => void;
   hideSnackbar: () => void;
 };

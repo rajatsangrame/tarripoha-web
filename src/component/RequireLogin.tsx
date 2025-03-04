@@ -1,9 +1,10 @@
 import React from 'react';
-import { Box, Button, Typography, Card } from '@mui/material';
+import { Box, Button, Card, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import LoginIcon from '@mui/icons-material/Login';
 
-export default function RequireLogin() {
+const RequireLogin: React.FC = () => {
+
   const navigate = useNavigate();
 
   return (
@@ -35,4 +36,6 @@ export default function RequireLogin() {
       </Card>
     </Box >
   );
-}
+};
+
+export default RequireLogin;

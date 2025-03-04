@@ -1,26 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+
 import {
   Box,
-  Container,
-  Typography,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
   Button,
-  InputAdornment,
-  OutlinedInput,
   Card,
   CircularProgress,
+  Container,
+  FormControl,
+  InputAdornment,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
   Pagination,
+  Select,
+  Typography,
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
-import { useAuth } from '../context/AuthContext';
 import { SearchResponse } from '../types/SearchResponse';
-import { WordGrid } from '../component/Word';
-import { Word } from '../types/Word';
 import { useSnackbarStore } from '../store/snackbarStore';
+import { Word } from '../types/Word';
+import { useAuth } from '../context/AuthContext';
+import WordGrid from '../component/Word';
 import RequireLogin from '../component/RequireLogin';
 
 const searchWords = async (

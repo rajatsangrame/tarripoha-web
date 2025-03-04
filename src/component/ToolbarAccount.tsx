@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, MenuItem, Avatar, IconButton, Typography, Divider, Box } from '@mui/material';
+import { Avatar, Box, Divider, IconButton, Menu, MenuItem, Typography } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import LoginIcon from '@mui/icons-material/Login';
 import { useAuth } from '../context/AuthContext';

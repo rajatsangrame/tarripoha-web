@@ -1,5 +1,5 @@
 import { Container } from '@mui/material';
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import DrawerHeader from './DrawerHeader';
 import Home from '../pages/Home';
 import Search from '../pages/Search';
