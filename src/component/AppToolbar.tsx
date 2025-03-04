@@ -1,12 +1,15 @@
 import React from 'react';
+
+import CorporateFare from '@mui/icons-material/CorporateFare';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuOpen from '@mui/icons-material/MenuOpen';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import DarkModeIcon from '@mui/icons-material/DarkMode';
-import CorporateFare from '@mui/icons-material/CorporateFare';
 import { AppBar, IconButton, Toolbar, Typography } from '@mui/material';
-import ToolbarAccount from './ToolbarAccount';
+
 import { useThemeContext } from '../context/ThemeContext';
+
+import ToolbarAccount from './ToolbarAccount';
 
 interface AppToolbarProps {
   drawerOpen: boolean;

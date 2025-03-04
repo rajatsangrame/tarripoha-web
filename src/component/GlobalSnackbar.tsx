@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Alert, AlertTitle, Snackbar } from '@mui/material';
+
 import { useSnackbarStore } from '../store/snackbarStore';
 
 const GlobalSnackbar: React.FC = () => {

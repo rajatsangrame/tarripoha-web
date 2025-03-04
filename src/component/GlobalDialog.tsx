@@ -1,7 +1,8 @@
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
-import { useDialogStore } from '../store/dialogStore';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material';
+
+import { useDialogStore } from '../store/dialogStore';
 
 export default function GlobalDialog() {
   const { open, title, message, onConfirm, closeDialog } = useDialogStore();

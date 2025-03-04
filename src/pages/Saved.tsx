@@ -1,7 +1,9 @@
+import { Box, Container, Typography } from '@mui/material';
+// eslint-disable-next-line import/named
+import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { Box, Container, Typography } from '@mui/material';
+
 import { useAuth } from '../context/AuthContext';
 
 interface Word {

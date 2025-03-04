@@ -1,13 +1,14 @@
-import React from "react";
-import { Box } from "@mui/material";
-import NavigationDrawer from "./component/NavigationDrawer";
-import AppToolbar from "./component/AppToolbar";
-import MainContainer from "./component/MainContainer";
-import { useState } from "react";
-import { AuthProvider } from "./context/AuthContext";
-import GlobalDialog from "./component/GlobalDialog";
-import GlobalSnackbar from "./component/GlobalSnackbar";
-import { ThemeContextProvider } from "./context/ThemeContext";
+import React, { useState } from 'react';
+
+import { Box } from '@mui/material';
+
+import AppToolbar from './component/AppToolbar';
+import GlobalDialog from './component/GlobalDialog';
+import GlobalSnackbar from './component/GlobalSnackbar';
+import MainContainer from './component/MainContainer';
+import NavigationDrawer from './component/NavigationDrawer';
+import { AuthProvider } from './context/AuthContext';
+import { ThemeContextProvider } from './context/ThemeContext';
 
 const App: React.FC = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);

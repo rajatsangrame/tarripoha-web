@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+
 import {
   Box,
   Button,
@@ -8,8 +9,9 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '../context/AuthContext';
 import { useSnackbarStore } from '../store/snackbarStore';
 
 export default function Login() {
@@ -42,8 +44,9 @@ export default function Login() {
       login(data.accessToken);
       navigate('/home', { replace: true });
       showSnackbar('Logged in successfully!');
-    } catch (err: any) {
-      setError(err.message);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      setError(error.message);
     } finally {
       setLoading(false);
     }

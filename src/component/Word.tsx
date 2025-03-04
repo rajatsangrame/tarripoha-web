@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Card, CardContent, Grid2 as Grid, IconButton, Typography } from '@mui/material';
+
 import {
   Bookmark,
   BookmarkBorder,
@@ -7,6 +7,8 @@ import {
   FavoriteBorder,
   Share,
 } from '@mui/icons-material';
+import { Box, Card, CardContent, Grid2 as Grid, IconButton, Typography } from '@mui/material';
+
 import { Word } from '../types/Word';
 
 interface WordCardProps {

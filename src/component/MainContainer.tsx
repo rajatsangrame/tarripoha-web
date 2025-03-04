@@ -1,11 +1,14 @@
+import React from 'react';
+
 import { Container } from '@mui/material';
 import { Route, Routes } from 'react-router-dom';
-import DrawerHeader from './DrawerHeader';
+
 import Home from '../pages/Home';
-import Search from '../pages/Search';
 import Login from '../pages/Login';
 import Saved from '../pages/Saved';
-import React from 'react';
+import Search from '../pages/Search';
+
+import DrawerHeader from './DrawerHeader';
 
 const MainContainer: React.FC = () => {
 

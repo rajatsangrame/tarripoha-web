@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 
+import { Search as SearchIcon } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -16,13 +16,14 @@ import {
   Select,
   Typography,
 } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
-import { SearchResponse } from '../types/SearchResponse';
-import { useSnackbarStore } from '../store/snackbarStore';
-import { Word } from '../types/Word';
-import { useAuth } from '../context/AuthContext';
-import WordGrid from '../component/Word';
+import axios from 'axios';
+
 import RequireLogin from '../component/RequireLogin';
+import WordGrid from '../component/Word';
+import { useAuth } from '../context/AuthContext';
+import { useSnackbarStore } from '../store/snackbarStore';
+import { SearchResponse } from '../types/SearchResponse';
+import { Word } from '../types/Word';
 
 const searchWords = async (
   token: string,

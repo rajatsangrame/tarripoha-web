@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { Avatar, Box, Divider, IconButton, Menu, MenuItem, Typography } from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
+
 import LoginIcon from '@mui/icons-material/Login';
+import LogoutIcon from '@mui/icons-material/Logout';
+import { Avatar, Box, Divider, IconButton, Menu, MenuItem, Typography } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
+
 import { useAuth } from '../context/AuthContext';
-import { Link } from 'react-router-dom';
 import { useDialogStore } from '../store/dialogStore';
 import { useSnackbarStore } from '../store/snackbarStore';
-import { useNavigate } from 'react-router-dom';
 
 export default function ToolbarAccount() {
   const showDialog = useDialogStore((state) => state.showDialog);
