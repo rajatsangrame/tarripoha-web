@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import {
   Box,
@@ -31,7 +30,6 @@ const searchWords = async (
   pageNo?: number,
   languageId?: number
 ) => {
-  if (!pageNo) return;
   const response = await axios.get<SearchResponse>(
     'http://localhost:3001/word/search',
     {
@@ -57,46 +55,58 @@ const getUserTokenOrShowError = () => {
 export default function Search() {
 
   const authToken = getUserTokenOrShowError();
-  if (!authToken) return <RequireLogin />;
+  const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
 
   const [query, setQuery] = useState('');
   const [languageId, setLanguageId] = useState<number | undefined>(undefined);
   const [pageNo, setPageNo] = useState<number | undefined>(undefined);
+  const [searchData, setSearchData] = useState<SearchResponse | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
   const pageSize = 20;
 
-  const { data, refetch, isFetching } = useQuery({
-    queryKey: ['searchWords', query, pageNo, languageId],
-    queryFn: () => searchWords(authToken, query, pageSize, pageNo, languageId),
-    enabled: false,
-  });
+  const refetch = async () => {
+    console.log('refetch', `pageNo ${pageNo} query ${query}`);
+    if (!pageNo || !query) return null;
+    setIsFetching(true);
+    const words = await searchWords(authToken, query, pageSize, pageNo, languageId);
+    setSearchData(words);
+    setIsFetching(false);
+  };
 
   useEffect(() => {
+    console.log('useEffect', `pageNo ${pageNo} query ${query}`);
     refetch();
   }, [pageNo]);
 
   const toggleLike = async (word: Word) => {
     try {
-
-      const newSaveStatus = !word.isLiked;
+      const newStatus = !word.isLiked;
       await axios.post(
         'http://localhost:3001/like/insert-like',
         {
-          contentId: word.id,
-          contentType: 1,
-          isActive: newSaveStatus,
+          contentId: word.id, contentType: 1, isActive: newStatus,
         },
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
 
-      refetch();
+      setSearchData((prevWords) =>
+        prevWords
+          ? {
+            ...prevWords,
+            data: prevWords.data.map((w) =>
+              w.id === word.id ? { ...w, isLiked: newStatus } : w
+            ),
+          }
+          : prevWords
+      );
+
     } catch (error) {
-      showSnackbar('Fail to update', 'error');
+      console.log(error);
+      showSnackbar(`Fail to update ${error}`, 'error');
     }
   };
-
-  const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
 
   const toggleSave = async (word: Word) => {
     try {
@@ -105,17 +115,23 @@ export default function Search() {
       await axios.post(
         'http://localhost:3001/saved/insert-saved',
         {
-          contentId: word.id,
-          contentType: 1,
-          isActive: newSaveStatus,
+          contentId: word.id, contentType: 1, isActive: newSaveStatus,
         },
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
       );
-
+      setSearchData((prevWords) =>
+        prevWords
+          ? {
+            ...prevWords,
+            data: prevWords.data.map((w) =>
+              w.id === word.id ? { ...w, isSaved: newSaveStatus } : w
+            ),
+          }
+          : prevWords
+      );
       showSnackbar('Updated Saved!');
-      refetch();
     } catch (error) {
       showSnackbar('Fail update the save', 'error');
     }
@@ -127,6 +143,10 @@ export default function Search() {
    * If the page no already 1. We force refresh as setPageNo(1) will have no effect.
    */
   const handleSearch = () => {
+    if (!query.trim()) {
+      showSnackbar('Please enter a search term.', 'info'); // Show error if query is empty
+      return;
+    }
     if (pageNo === 1) {
       refetch();
       return;
@@ -137,6 +157,8 @@ export default function Search() {
   const handlePageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
     setPageNo(newPage);
   };
+
+  if (!authToken) return <RequireLogin />;
 
   return (
     <Container sx={{ mt: 4, pb: 4 }}>
@@ -191,6 +213,7 @@ export default function Search() {
           <Button
             variant="contained"
             onClick={handleSearch}
+            disabled={!query.trim()}
             sx={{
               minWidth: 130,
               height: 46,
@@ -214,12 +237,12 @@ export default function Search() {
       {!isFetching && (
         <Box sx={{ flexGrow: 1, mt: 3 }} display="flex" width='100%'>
           <WordGrid
-            words={data?.data || []}
+            words={searchData?.data || []}
             toggleLike={toggleLike}
             toggleSave={toggleSave}
           ></WordGrid>
 
-          {data?.total === 0 && (
+          {searchData?.total === 0 && (
             <Box display="flex" justifyContent="center" width="100%" sx={{ mt: 3 }}>
               <Typography sx={{ color: 'text.secondary' }}>
                 No results found
@@ -228,10 +251,10 @@ export default function Search() {
           )}
         </Box>
       )}
-      {data?.total !== undefined && data.total > 0 && (
+      {searchData?.total !== undefined && searchData.total > 0 && (
         <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
           <Pagination
-            count={Math.ceil(data.total / pageSize) || 1}
+            count={Math.ceil(searchData.total / pageSize) || 1}
             page={pageNo}
             onChange={handlePageChange}
             color="primary"

@@ -39,7 +39,7 @@ const NavigationDrawer: React.FC<NavigationDrawerProps> = ({ drawerOpen, drawerW
             const isActive = location.pathname === item.path;
 
             return (
-              <ListItem key={'menu-item'} disablePadding>
+              <ListItem key={item.text} disablePadding>
                 <ListItemButton
                   component={Link}
                   to={item.path}
