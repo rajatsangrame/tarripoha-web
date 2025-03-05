@@ -1,74 +1,177 @@
-import { Box, Container, Typography } from '@mui/material';
-// eslint-disable-next-line import/named
-import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import { useQuery } from '@tanstack/react-query';
+import React, { useEffect, useState } from 'react';
+
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Pagination,
+  Typography,
+} from '@mui/material';
 import axios from 'axios';
 
+import RequireLogin from '../component/RequireLogin';
+import WordGrid from '../component/Word';
 import { useAuth } from '../context/AuthContext';
+import { useSnackbarStore } from '../store/snackbarStore';
+import { SearchResponse } from '../types/SearchResponse';
+import { Word } from '../types/Word';
 
-interface Word {
-  id: number;
-  name: string;
-  meaning: string;
-  languageId: number;
-}
-
-const fetchSavedWords = async (token: string): Promise<Word[]> => {
-  const response = await axios.get<Word[]>('http://localhost:3001/word/get-words', {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
+const fetchSavedWords = async (
+  token: string,
+  pageSize: number,
+  pageNo?: number
+) => {
+  const response = await axios.get<SearchResponse>(
+    'http://localhost:3001/saved/get-saved',
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        contentType: 1,
+        pageNo,
+        pageSize,
+      },
+    }
+  );
+  console.log(response.data);
   return response.data;
 };
 
-export default function Saved() {
+const getUserTokenOrShowError = () => {
   const { getToken } = useAuth();
-  const token = getToken();
+  const authToken = getToken();
+  if (!authToken) return '';
+  return authToken;
+};
 
-  const { data: words, error, isLoading } = useQuery({
-    queryKey: ['savedWords'],
-    queryFn: () => fetchSavedWords(token ?? '')
-  });
+export default function Saved() {
 
-  if (isLoading) return <Typography>Loading...</Typography>;
-  if (error) {
-    console.log(error);
-    return <Typography variant="h6" color="error">Error loading data: {error instanceof Error ? error.message : 'Unknown error'}</Typography>;
-  }
+  const authToken = getUserTokenOrShowError();
+  const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
 
-  const columns: GridColDef[] = [
-    { field: 'name', headerName: 'Word', align: 'center', headerAlign: 'center', width: 200 },
-    { field: 'meaning', headerName: 'Meaning', align: 'center', headerAlign: 'center', width: 200 },
-  ];
+  const [pageNo, setPageNo] = useState(1);
+  const [savedData, setSavedData] = useState<SearchResponse | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
+  const pageSize = 20;
+
+  const refetch = async () => {
+    console.log('refetch', `pageNo ${pageNo}`);
+    if (!pageNo) return null;
+    setIsFetching(true);
+    const words = await fetchSavedWords(authToken, pageSize, pageNo);
+    setSavedData(words);
+    setIsFetching(false);
+  };
+
+  useEffect(() => {
+    console.log('useEffect', `pageNo ${pageNo}`);
+    refetch();
+  }, [pageNo]);
+
+  const toggleLike = async (word: Word) => {
+    try {
+      const newStatus = !word.isLiked;
+      await axios.post(
+        'http://localhost:3001/like/insert-like',
+        {
+          contentId: word.id, contentType: 1, isActive: newStatus,
+        },
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+
+      setSavedData((prevWords) =>
+        prevWords
+          ? {
+            ...prevWords,
+            data: prevWords.data.map((w) =>
+              w.id === word.id ? { ...w, isLiked: newStatus } : w
+            ),
+          }
+          : prevWords
+      );
+
+    } catch (error) {
+      console.log(error);
+      showSnackbar(`Fail to update ${error}`, 'error');
+    }
+  };
+
+  const toggleSave = async (word: Word) => {
+    try {
+
+      const newSaveStatus = !word.isSaved;
+      await axios.post(
+        'http://localhost:3001/saved/insert-saved',
+        {
+          contentId: word.id, contentType: 1, isActive: newSaveStatus,
+        },
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+      setSavedData((prevWords) =>
+        prevWords
+          ? {
+            ...prevWords,
+            data: prevWords.data.map((w) =>
+              w.id === word.id ? { ...w, isSaved: newSaveStatus } : w
+            ),
+          }
+          : prevWords
+      );
+      showSnackbar('Updated Saved!');
+    } catch (error) {
+      showSnackbar('Fail update the save', 'error');
+    }
+  };
+
+  const handlePageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
+    setPageNo(newPage);
+  };
+
+  if (!authToken) return <RequireLogin />;
 
   return (
-    <Container>
-      <Box
-        sx={{
-          py: 4,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          textAlign: 'center',
-          width: '100%',
-        }}
-      >
-        <Typography variant="h4">Saved Words</Typography>
-      </Box>
-      <DataGrid
-        rows={words || []}
-        columns={columns}
-        sx={{
-          '& .MuiDataGrid-colu': {
-            fontWeight: 'bold',
-          },
-          '& .MuiDataGrid-cell:hover': {
-            color: 'primary.main',
-          },
-        }}
-      />
+    <Container sx={{ mt: 4, pb: 4 }}>
+      <Typography variant="h4" sx={{ mb: 3, fontWeight: 'bold', textAlign: 'center' }}>
+        Saved Words
+      </Typography>
+
+      {isFetching && (
+        <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
+          <CircularProgress />
+        </Box>
+      )}
+
+      {!isFetching && (
+        <Box sx={{ flexGrow: 1, mt: 3 }} display="flex" width='100%'>
+          <WordGrid
+            words={savedData?.data || []}
+            toggleLike={toggleLike}
+            toggleSave={toggleSave}
+          ></WordGrid>
+
+          {savedData?.total === 0 && (
+            <Box display="flex" justifyContent="center" width="100%" sx={{ mt: 3 }}>
+              <Typography sx={{ color: 'text.secondary' }}>
+                No results found
+              </Typography>
+            </Box>
+          )}
+        </Box>
+      )}
+      {savedData?.total !== undefined && savedData.total > 0 && (
+        <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
+          <Pagination
+            count={Math.ceil(savedData.total / pageSize) || 1}
+            page={pageNo}
+            onChange={handlePageChange}
+            color="primary"
+            size="large"
+          />
+        </Box>
+      )}
     </Container>
   );
 }

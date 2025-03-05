@@ -40,7 +40,7 @@ const searchWords = async (
         query,
         pageNo,
         pageSize,
-        ...(languageId !== undefined ? { languageId } : {}),
+        ...(languageId ? { languageId } : {}),
       },
     }
   );
@@ -182,6 +182,11 @@ export default function Search() {
               placeholder="Search for a word..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  handleSearch();
+                }
+              }}
               startAdornment={
                 <InputAdornment position="start">
                   <SearchIcon sx={{ color: 'text.secondary' }} />
@@ -237,12 +242,24 @@ export default function Search() {
       )}
 
       {!isFetching && (
-        <Box sx={{ flexGrow: 1, mt: 3 }} display="flex" width='100%'>
+        <Box sx={{ flexGrow: 1, mt: 3 }} flexDirection="column" display="flex" width='100%'>
           <WordGrid
             words={searchData?.data || []}
             toggleLike={toggleLike}
             toggleSave={toggleSave}
           ></WordGrid>
+
+          {searchData?.total !== undefined && searchData.total > 0 && (
+            <Box display="flex" justifyContent="center" width='100%' sx={{ mt: 3 }}>
+              <Pagination
+                count={Math.ceil(searchData.total / pageSize) || 1}
+                page={pageNo}
+                onChange={handlePageChange}
+                color="primary"
+                size="large"
+              />
+            </Box>
+          )}
 
           {searchData?.total === 0 && (
             <Box display="flex" justifyContent="center" width="100%" sx={{ mt: 3 }}>
@@ -253,17 +270,7 @@ export default function Search() {
           )}
         </Box>
       )}
-      {searchData?.total !== undefined && searchData.total > 0 && (
-        <Box display="flex" justifyContent="center" sx={{ mt: 3 }}>
-          <Pagination
-            count={Math.ceil(searchData.total / pageSize) || 1}
-            page={pageNo}
-            onChange={handlePageChange}
-            color="primary"
-            size="large"
-          />
-        </Box>
-      )}
+
     </Container>
   );
 }
