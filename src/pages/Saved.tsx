@@ -32,7 +32,6 @@ const fetchSavedWords = async (
       },
     }
   );
-  console.log(response.data);
   return response.data;
 };
 
@@ -54,8 +53,7 @@ export default function Saved() {
   const pageSize = 20;
 
   const refetch = async () => {
-    console.log('refetch', `pageNo ${pageNo}`);
-    if (!pageNo) return null;
+    if (!pageNo || !authToken) return null;
     setIsFetching(true);
     const words = await fetchSavedWords(authToken, pageSize, pageNo);
     setSavedData(words);
@@ -63,7 +61,6 @@ export default function Saved() {
   };
 
   useEffect(() => {
-    console.log('useEffect', `pageNo ${pageNo}`);
     refetch();
   }, [pageNo]);
 
@@ -92,7 +89,6 @@ export default function Saved() {
       );
 
     } catch (error) {
-      console.log(error);
       showSnackbar(`Fail to update ${error}`, 'error');
     }
   };

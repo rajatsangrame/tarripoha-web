@@ -67,7 +67,6 @@ export default function Search() {
   const pageSize = 20;
 
   const refetch = async () => {
-    console.log('refetch', `pageNo ${pageNo} query ${query}`);
     if (!pageNo || !query) return null;
     setIsFetching(true);
     const words = await searchWords(authToken, query, pageSize, pageNo, languageId);
@@ -76,7 +75,6 @@ export default function Search() {
   };
 
   useEffect(() => {
-    console.log('useEffect', `pageNo ${pageNo} query ${query}`);
     refetch();
   }, [pageNo]);
 
@@ -105,7 +103,6 @@ export default function Search() {
       );
 
     } catch (error) {
-      console.log(error);
       showSnackbar(`Fail to update ${error}`, 'error');
     }
   };
