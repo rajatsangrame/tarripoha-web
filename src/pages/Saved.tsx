@@ -13,15 +13,15 @@ import RequireLogin from '../component/RequireLogin';
 import WordGrid from '../component/Word';
 import { useAuth } from '../context/AuthContext';
 import { useSnackbarStore } from '../store/snackbarStore';
-import { SearchResponse } from '../types/SearchResponse';
 import { Word } from '../types/Word';
+import { WordsResponse } from '../types/WordsResponse';
 
 const fetchSavedWords = async (
   token: string,
   pageSize: number,
   pageNo?: number
 ) => {
-  const response = await axios.get<SearchResponse>(
+  const response = await axios.get<WordsResponse>(
     'http://localhost:3001/saved/get-saved',
     {
       headers: { Authorization: `Bearer ${token}` },
@@ -49,7 +49,7 @@ export default function Saved() {
   const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
 
   const [pageNo, setPageNo] = useState(1);
-  const [savedData, setSavedData] = useState<SearchResponse | null>(null);
+  const [savedData, setSavedData] = useState<WordsResponse | null>(null);
   const [isFetching, setIsFetching] = useState(false);
   const pageSize = 20;
 

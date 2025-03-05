@@ -22,8 +22,8 @@ import RequireLogin from '../component/RequireLogin';
 import WordGrid from '../component/Word';
 import { useAuth } from '../context/AuthContext';
 import { useSnackbarStore } from '../store/snackbarStore';
-import { SearchResponse } from '../types/SearchResponse';
 import { Word } from '../types/Word';
+import { WordsResponse } from '../types/WordsResponse';
 
 const searchWords = async (
   token: string,
@@ -32,7 +32,7 @@ const searchWords = async (
   pageNo?: number,
   languageId?: number
 ) => {
-  const response = await axios.get<SearchResponse>(
+  const response = await axios.get<WordsResponse>(
     'http://localhost:3001/word/search',
     {
       headers: { Authorization: `Bearer ${token}` },
@@ -62,7 +62,7 @@ export default function Search() {
   const [query, setQuery] = useState('');
   const [languageId, setLanguageId] = useState<number | undefined>(undefined);
   const [pageNo, setPageNo] = useState<number | undefined>(undefined);
-  const [searchData, setSearchData] = useState<SearchResponse | null>(null);
+  const [searchData, setSearchData] = useState<WordsResponse | null>(null);
   const [isFetching, setIsFetching] = useState(false);
   const pageSize = 20;
 
