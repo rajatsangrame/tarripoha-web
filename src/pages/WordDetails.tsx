@@ -1,33 +1,59 @@
 import React, { useEffect, useState } from 'react';
 
 import { Box, Button, Card, CardContent, Chip, TextField, Typography } from '@mui/material';
+import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 import { UserRoleType } from '../common/enum';
 import { useAuth } from '../context/AuthContext';
 import { Word } from '../types/Word';
 
+const getUserTokenOrShowError = () => {
+  const { getToken } = useAuth();
+  const authToken = getToken();
+  if (!authToken) return '';
+  return authToken;
+};
+
+const fetchWord = async (
+  id: number,
+  token: string
+) => {
+  const response = await axios.get<Word>(
+    `http://localhost:3001/word/${id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return response.data;
+};
+
 const WordDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { getUser } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [word, setWord] = useState<Word | null>(null);
+  const [isFetching, setIsFetching] = useState(false);
   const [editedWord, setEditedWord] = useState<Word | null>(null);
   const user = getUser();
+  const authToken = getUserTokenOrShowError();
+
+  const fetch = async () => {
+
+    const wordId = Number(id);
+    if (isNaN(wordId)) {
+      return;
+    }
+
+    setIsFetching(true);
+    const word = await fetchWord(wordId, authToken);
+    setIsFetching(false);
+    setEditedWord(word);
+    setWord(word);
+  };
 
   useEffect(() => {
-    const fetchWord = async () => {
-      try {
-        const response = await fetch(`http://localhost:3001/word/${id}`);
-        const data = await response.json();
-        setWord(data);
-        setEditedWord(data);
-      } catch (error) {
-        console.error('Error fetching word:', error);
-      }
-    };
-
-    fetchWord();
+    fetch();
   }, [id]);
 
   const isUserAllowedToEdit = user?.roles.some((role) =>
