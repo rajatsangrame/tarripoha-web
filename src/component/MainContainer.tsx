@@ -7,6 +7,7 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Saved from '../pages/Saved';
 import Search from '../pages/Search';
+import WordDetails from '../pages/WordDetails';
 
 import DrawerHeader from './DrawerHeader';
 
@@ -26,6 +27,7 @@ const MainContainer: React.FC = () => {
         <Route path="/search" element={<Search />} />
         <Route path="/login" element={<Login />} />
         <Route path="/saved" element={<Saved />} />
+        <Route path="/word/:id" element={<WordDetails />} />
       </Routes>
 
     </Container>

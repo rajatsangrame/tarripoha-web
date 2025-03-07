@@ -17,6 +17,8 @@ interface WordCardProps {
   toggleLike: (word: Word) => void;
   // eslint-disable-next-line no-unused-vars
   toggleSave: (word: Word) => void;
+  // eslint-disable-next-line no-unused-vars
+  onClickWord: (word: Word) => void;
 }
 
 const getLanguageSymbol = (languageId?: number) => {
@@ -25,9 +27,11 @@ const getLanguageSymbol = (languageId?: number) => {
   return null;
 };
 
-const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave }) => {
+const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave, onClickWord }) => {
+
   return (
     <Card
+      onClick={() => onClickWord(word)}
       sx={{
         width: 250,
         height: 180,
@@ -98,15 +102,17 @@ interface WordGridProps {
   toggleLike: (word: Word) => void;
   // eslint-disable-next-line no-unused-vars
   toggleSave: (word: Word) => void;
+  // eslint-disable-next-line no-unused-vars
+  onClickWord: (word: Word) => void;
 }
 
-const WordGrid: React.FC<WordGridProps> = ({ words, toggleLike, toggleSave }) => {
+const WordGrid: React.FC<WordGridProps> = ({ words, toggleLike, toggleSave, onClickWord }) => {
 
   return (
     <Grid container justifyContent="center" rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>
       {words?.map((word) => (
         <Grid key={word.id} sx={{ width: '250px' }}>
-          <WordCard word={word} toggleLike={toggleLike} toggleSave={toggleSave} />
+          <WordCard word={word} toggleLike={toggleLike} toggleSave={toggleSave} onClickWord={onClickWord} />
         </Grid>
       ))}
     </Grid>

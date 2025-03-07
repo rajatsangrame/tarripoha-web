@@ -8,6 +8,7 @@ import {
   Typography,
 } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 import RequireLogin from '../component/RequireLogin';
 import WordGrid from '../component/Word';
@@ -44,6 +45,7 @@ const getUserTokenOrShowError = () => {
 
 export default function Saved() {
 
+  const navigate = useNavigate();
   const authToken = getUserTokenOrShowError();
   const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
 
@@ -122,6 +124,10 @@ export default function Saved() {
     }
   };
 
+  const onClickWord = async (word: Word) => {
+    navigate(`/word/${word.id}`);
+  };
+
   const handlePageChange = (_event: React.ChangeEvent<unknown>, newPage: number) => {
     setPageNo(newPage);
   };
@@ -146,6 +152,7 @@ export default function Saved() {
             words={savedData?.data || []}
             toggleLike={toggleLike}
             toggleSave={toggleSave}
+            onClickWord={onClickWord}
           ></WordGrid>
 
           {savedData?.total === 0 && (

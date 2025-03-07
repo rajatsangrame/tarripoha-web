@@ -15,6 +15,7 @@ type User = {
   email: string
   firstName: string
   lastName: string
+  roles: string[]
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

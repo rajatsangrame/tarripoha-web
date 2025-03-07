@@ -7,6 +7,7 @@ export interface Word {
   userId: number;
   name: string;
   meaning: string;
+  tags: string;
   englishMeaning: string | null;
   description?: string | null;
   isActive: boolean;

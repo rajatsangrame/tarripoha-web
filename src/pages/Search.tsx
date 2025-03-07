@@ -17,6 +17,7 @@ import {
   Typography,
 } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 import RequireLogin from '../component/RequireLogin';
 import WordGrid from '../component/Word';
@@ -58,6 +59,7 @@ export default function Search() {
 
   const authToken = getUserTokenOrShowError();
   const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
+  const navigate = useNavigate();
 
   const [query, setQuery] = useState('');
   const [languageId, setLanguageId] = useState<number | undefined>(undefined);
@@ -134,6 +136,10 @@ export default function Search() {
     } catch (error) {
       showSnackbar('Fail update the save', 'error');
     }
+  };
+
+  const onClickWord = async (word: Word) => {
+    navigate(`/word/${word.id}`);
   };
 
   /**
@@ -244,6 +250,7 @@ export default function Search() {
             words={searchData?.data || []}
             toggleLike={toggleLike}
             toggleSave={toggleSave}
+            onClickWord={onClickWord}
           ></WordGrid>
 
           {searchData?.total !== undefined && searchData.total > 0 && (
