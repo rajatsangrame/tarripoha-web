@@ -219,6 +219,7 @@ const WordDetail: React.FC = () => {
             variant="outlined"
             label="Description"
             value={editedWord?.description || ''}
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             onChange={(e) => setEditedWord({ ...editedWord!, description: e.target.value })}
             sx={{ mb: 2 }}
           />
@@ -241,6 +242,7 @@ const WordDetail: React.FC = () => {
                   if (newTag) {
                     const tagsArray = editedWord?.tags ? editedWord.tags.split(' ') : [];
                     if (!tagsArray.includes(newTag)) {
+                      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                       setEditedWord({ ...editedWord!, tags: [...tagsArray, newTag].join(' ') });
                     }
                     target.value = '';
@@ -262,6 +264,7 @@ const WordDetail: React.FC = () => {
                   variant="outlined"
                   onDelete={() => {
                     const newTags = editedWord.tags.split(' ').filter((t) => t !== tag).join(' ');
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     setEditedWord({ ...editedWord!, tags: newTags });
                   }}
                   sx={{ fontSize: '0.85rem' }}
