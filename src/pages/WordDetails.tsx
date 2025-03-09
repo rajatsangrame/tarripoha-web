@@ -92,7 +92,7 @@ const WordDetail: React.FC = () => {
       <Card sx={{ maxWidth: 600, mx: 'auto', mt: 8, p: 3, boxShadow: 3, borderRadius: 3 }}>
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h4" fontWeight="bold">{word.name}</Typography>
+            <Typography variant="h4" fontWeight={700} color="primary.main">{word.name}</Typography>
             {canEdit && (
               <Button
                 color="primary"
@@ -106,39 +106,40 @@ const WordDetail: React.FC = () => {
             )}
           </Box>
 
-          <Typography variant="h5" color="text.secondary" sx={{ mt: 1 }}>{word.meaning}</Typography>
+          <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>{word.meaning}</Typography>
 
           {word.englishMeaning && (
-            <Typography variant="h6" sx={{ mt: 1, fontStyle: 'italic' }}>
+            <Typography variant="subtitle1" sx={{ mt: 1, fontStyle: 'italic' }}>
               {word.englishMeaning}
             </Typography>
           )}
 
           {word.description && (
-            <Typography variant="body1" sx={{ mt: 2, color: 'text.secondary' }}>
+            <Typography variant="body1" sx={{ mt: 2, color: 'text.secondary', lineHeight: 1.6 }}>
               {word.description}
             </Typography>
           )}
 
-          {/* Additional Details */}
-          {word.language?.name && (
-            <Typography variant="body2" sx={{ mt: 2 }}>
-              <strong>Language:</strong> {word.language.name}
-            </Typography>
-          )}
+          <Box sx={{ mt: 3, p: 2, bgcolor: 'divider', borderRadius: 2 }}>
+            {word.language?.name && (
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Language:</strong> {word.language.name}
+              </Typography>
+            )}
 
-          {word.user?.username && (
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              <strong>Added by User:</strong> {word.user.username}
-            </Typography>
-          )}
+            {word.user?.username && (
+              <Typography variant="body2">
+                <strong>Added by:</strong> {word.user.username}
+              </Typography>
+            )}
+          </Box>
 
-          {/* Tags Section */}
           {word.tags && (
             <Box sx={{ mt: 2 }}>
+              <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Tags:</Typography>
               <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {word.tags.split(' ').map((tag, index) => (
-                  <Chip key={index} label={`#${tag}`} variant="outlined" />
+                  <Chip key={index} label={`#${tag}`} variant="outlined" color="primary" />
                 ))}
               </Box>
             </Box>
