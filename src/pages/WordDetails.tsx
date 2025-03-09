@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/EditNote';
+import TagIcon from '@mui/icons-material/Tag';
 import {
   Box,
   Button,
@@ -14,6 +15,8 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  InputAdornment,
+  OutlinedInput,
   TextField,
   Typography,
 } from '@mui/material';
@@ -160,11 +163,11 @@ const WordDetail: React.FC = () => {
           Edit Word
         </DialogTitle>
 
-        <DialogContent sx={{ maxHeight: '50vh', overflowY: 'auto' }}>
+        <DialogContent sx={{ maxHeight: '60vh', overflowY: 'auto' }}>
           <TextField
             fullWidth
             variant="outlined"
-            label="Word Name"
+            label="Word"
             value={editedWord?.name || ''}
             onChange={(e) => setEditedWord({ ...editedWord!, name: e.target.value })}
             sx={{ mt: 2, mb: 2 }}
@@ -199,14 +202,39 @@ const WordDetail: React.FC = () => {
             sx={{ mb: 2 }}
           />
 
-          {/* Editable Tags Section */}
           <Box sx={{ mt: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold">
               Tags:
             </Typography>
 
+            <OutlinedInput
+              sx={{ mt: 1 }}
+
+              placeholder="Enter the tags..."
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+
+                  const target = e.currentTarget as HTMLInputElement;
+                  const newTag = target.value;
+
+                  if (newTag) {
+                    const tagsArray = editedWord?.tags ? editedWord.tags.split(' ') : [];
+                    if (!tagsArray.includes(newTag)) {
+                      setEditedWord({ ...editedWord!, tags: [...tagsArray, newTag].join(' ') });
+                    }
+                    target.value = '';
+                  }
+                }
+              }}
+              startAdornment={
+                <InputAdornment position="start">
+                  <TagIcon sx={{ color: 'text.secondary' }} />
+                </InputAdornment>
+              }
+            />
+
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-              {editedWord?.tags?.split(' ').map((tag, index) => (
+              {editedWord?.tags && editedWord?.tags?.split(' ').map((tag, index) => (
                 <Chip
                   key={index}
                   label={`#${tag}`}
@@ -220,24 +248,6 @@ const WordDetail: React.FC = () => {
               ))}
             </Box>
 
-            <TextField
-              fullWidth
-              variant="outlined"
-              label="Add Tag"
-              placeholder="Type a tag and press Enter"
-              sx={{ mt: 2 }}
-              onKeyDown={(e) => {
-                const target = e.currentTarget as HTMLInputElement; // Type assertion
-                if (e.key === 'Enter' && target.value.trim()) {
-                  const newTags = editedWord?.tags
-                    ? `${editedWord.tags} ${target.value.trim()}`
-                    : target.value.trim();
-
-                  setEditedWord({ ...editedWord!, tags: newTags });
-                  target.value = ''; // Clear input
-                }
-              }}
-            />
           </Box>
         </DialogContent>
 
