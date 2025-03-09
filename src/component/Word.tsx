@@ -9,6 +9,7 @@ import {
 } from '@mui/icons-material';
 import { Box, Card, CardContent, Grid2 as Grid, IconButton, Typography } from '@mui/material';
 
+import { getLanguageById } from '../common/util';
 import { Word } from '../types/Word';
 
 interface WordCardProps {
@@ -20,12 +21,6 @@ interface WordCardProps {
   // eslint-disable-next-line no-unused-vars
   onClickWord: (word: Word) => void;
 }
-
-const getLanguageSymbol = (languageId?: number) => {
-  if (languageId === 1) return 'म';
-  if (languageId === 2) return 'हिं';
-  return null;
-};
 
 const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave, onClickWord }) => {
 
@@ -58,7 +53,7 @@ const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave, onCli
             fontWeight: 'bold',
           }}
         >
-          {getLanguageSymbol(word.languageId)}
+          {getLanguageById(word.languageId)?.symbol}
         </Box>
       )}
       <Box

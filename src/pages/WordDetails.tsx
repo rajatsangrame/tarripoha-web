@@ -24,6 +24,7 @@ import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 import { userRoleType } from '../common/enum';
+import { getLanguageById } from '../common/util';
 import { useAuth } from '../context/AuthContext';
 import { Word } from '../types/Word';
 
@@ -106,6 +107,27 @@ const WordDetail: React.FC = () => {
             )}
           </Box>
 
+          {word.language && (
+            <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box
+                sx={{
+                  top: 8,
+                  right: 8,
+                  backgroundColor: 'divider',
+                  px: 1.5,
+                  py: 0.5,
+                  borderRadius: 2,
+                  fontWeight: 'bold',
+                }}
+              >
+                {getLanguageById(word.languageId)?.symbol}
+              </Box>
+              <Typography variant="h6" color="text.secondary">
+                {getLanguageById(word.languageId)?.value}
+              </Typography>
+            </Box>
+          )}
+
           <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>{word.meaning}</Typography>
 
           {word.englishMeaning && (
@@ -121,11 +143,6 @@ const WordDetail: React.FC = () => {
           )}
 
           <Box sx={{ mt: 3, p: 2, bgcolor: 'divider', borderRadius: 2 }}>
-            {word.language?.name && (
-              <Typography variant="body2" sx={{ mb: 1 }}>
-                <strong>Language:</strong> {word.language.name}
-              </Typography>
-            )}
 
             {word.user?.username && (
               <Typography variant="body2">
@@ -170,6 +187,7 @@ const WordDetail: React.FC = () => {
             variant="outlined"
             label="Word"
             value={editedWord?.name || ''}
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             onChange={(e) => setEditedWord({ ...editedWord!, name: e.target.value })}
             sx={{ mt: 2, mb: 2 }}
           />
@@ -179,6 +197,7 @@ const WordDetail: React.FC = () => {
             variant="outlined"
             label="Meaning"
             value={editedWord?.meaning || ''}
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             onChange={(e) => setEditedWord({ ...editedWord!, meaning: e.target.value })}
             sx={{ mb: 2 }}
           />
@@ -188,6 +207,7 @@ const WordDetail: React.FC = () => {
             variant="outlined"
             label="English Meaning"
             value={editedWord?.englishMeaning || ''}
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             onChange={(e) => setEditedWord({ ...editedWord!, englishMeaning: e.target.value })}
             sx={{ mb: 2 }}
           />

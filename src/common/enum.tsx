@@ -13,4 +13,19 @@ const userRoleType = {
   }
 };
 
-export { userRoleType };
+const languageType = {
+  MARATHI: {
+    id: 1,
+    name: 'Marathi',
+    value: 'मराठी',
+    symbol: 'म',
+  },
+  HINDI: {
+    id: 2,
+    name: 'Hindi',
+    value: 'हिन्दी',
+    symbol: 'हिं',
+  },
+};
+
+export { userRoleType, languageType };
