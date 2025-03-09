@@ -7,7 +7,7 @@ import {
   FavoriteBorder,
   Share,
 } from '@mui/icons-material';
-import { Box, Card, CardContent, Grid2 as Grid, IconButton, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, CardContent, Grid2 as Grid, IconButton, Typography } from '@mui/material';
 
 import { getLanguageById } from '../common/util';
 import { Word } from '../types/Word';
@@ -26,7 +26,6 @@ const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave, onCli
 
   return (
     <Card
-      onClick={() => onClickWord(word)}
       sx={{
         width: 250,
         height: 180,
@@ -37,15 +36,17 @@ const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave, onCli
         flexDirection: 'column',
         position: 'relative',
         textAlign: 'left',
-      }}>
-      {word.languageId && (
+      }}
+    >
+      <CardActionArea onClick={() => onClickWord(word)}>
+
         <Box
           sx={{
             position: 'absolute',
             top: 8,
             right: 8,
-            backgroundColor: 'lightgray',
-            color: 'black',
+            backgroundColor: 'divider',
+            color: 'primary',
             px: 1,
             py: 0.5,
             borderRadius: 1,
@@ -55,7 +56,20 @@ const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave, onCli
         >
           {getLanguageById(word.languageId)?.symbol}
         </Box>
-      )}
+
+        <CardContent sx={{ flexGrow: 1, overflow: 'hidden' }}>
+          <Typography variant="h6" fontWeight="bold">
+            {word.name}
+          </Typography>
+          <Typography color="text.secondary">{word.meaning}</Typography>
+          {word.englishMeaning && (
+            <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
+              {word.englishMeaning}
+            </Typography>
+          )}
+        </CardContent>
+      </CardActionArea>
+
       <Box
         sx={{
           position: 'absolute',
@@ -75,18 +89,6 @@ const WordCard: React.FC<WordCardProps> = ({ word, toggleLike, toggleSave, onCli
           <Share />
         </IconButton>
       </Box>
-
-      <CardContent sx={{ flexGrow: 1, overflow: 'hidden' }}>
-        <Typography variant="h6" fontWeight="bold">
-          {word.name}
-        </Typography>
-        <Typography color="text.secondary">{word.meaning}</Typography>
-        {word.englishMeaning && (
-          <Typography variant="body2" sx={{ mt: 1 }} color="text.secondary">
-            {word.englishMeaning}
-          </Typography>
-        )}
-      </CardContent>
     </Card>
   );
 };
@@ -104,7 +106,7 @@ interface WordGridProps {
 const WordGrid: React.FC<WordGridProps> = ({ words, toggleLike, toggleSave, onClickWord }) => {
 
   return (
-    <Grid container justifyContent="center" rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>
+    <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}>
       {words?.map((word) => (
         <Grid key={word.id} sx={{ width: '250px' }}>
           <WordCard word={word} toggleLike={toggleLike} toggleSave={toggleSave} onClickWord={onClickWord} />
