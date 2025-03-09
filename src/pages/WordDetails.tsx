@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react';
 
+import {
+  Bookmark,
+  BookmarkBorder,
+  Favorite,
+  FavoriteBorder,
+  Share,
+} from '@mui/icons-material';
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/EditNote';
@@ -7,10 +14,9 @@ import TagIcon from '@mui/icons-material/Tag';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Chip,
   CircularProgress,
+  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -84,85 +90,163 @@ const WordDetail: React.FC = () => {
     );
   }
 
+  const toggleLike = async (word: Word) => {
+    //
+  };
+
+  const toggleSave = async (word: Word) => {
+    //
+  };
+
   if (!word) {
     return <Typography variant="h6" textAlign="center">Word not found.</Typography>;
   }
 
   return (
-    <>
-      <Card sx={{ maxWidth: 600, mx: 'auto', mt: 8, p: 3, boxShadow: 3, borderRadius: 3 }}>
-        <CardContent>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Typography variant="h4" fontWeight={700} color="primary.main">{word.name}</Typography>
-            {canEdit && (
-              <Button
-                color="primary"
-                onClick={handleEditClick}
-                variant="contained"
-                startIcon={<EditIcon />}
-                sx={{ borderRadius: 2, boxShadow: 2 }}
-              >
-                Edit
-              </Button>
-            )}
-          </Box>
 
-          {word.language && (
-            <Box sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Box
-                sx={{
-                  top: 8,
-                  right: 8,
-                  backgroundColor: 'divider',
-                  px: 1.5,
-                  py: 0.5,
-                  borderRadius: 2,
-                  fontWeight: 'bold',
-                }}
-              >
-                {getLanguageById(word.languageId)?.symbol}
-              </Box>
-              <Typography variant="h6" color="text.secondary">
-                {getLanguageById(word.languageId)?.value}
-              </Typography>
-            </Box>
+    <Container maxWidth="xl" sx={{ mt: 4, height: '100vh', display: 'flex' }}>
+
+      <Box sx={{ flex: 1, p: 2 }}>
+
+        <Typography variant="h1" sx={{ fontWeight: 'bold', textAlign: 'left' }}>
+          {word.name}
+        </Typography>
+
+        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          {canEdit && (
+            <Button
+              color="primary"
+              onClick={handleEditClick}
+              variant="contained"
+              startIcon={<EditIcon />}
+              sx={{ borderRadius: 2, boxShadow: 2 }}
+            >
+              Edit
+            </Button>
           )}
+        </Box>
 
-          <Typography variant="h6" color="text.secondary" sx={{ mt: 1 }}>{word.meaning}</Typography>
+        {word.language && (
+          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{
+                top: 8,
+                right: 8,
+                backgroundColor: 'divider',
+                px: 1.5,
+                py: 0.5,
+                borderRadius: 2,
+                fontWeight: 'bold',
+              }}
+            >
+              {getLanguageById(word.languageId)?.symbol}
+            </Box>
+            <Typography variant="body1" color="text.secondary">
+              {getLanguageById(word.languageId)?.value}
+            </Typography>
+          </Box>
+        )}
 
-          {word.englishMeaning && (
-            <Typography variant="subtitle1" sx={{ mt: 1, fontStyle: 'italic' }}>
+        <Typography sx={{ mt: 2 }} variant="subtitle1" fontWeight="bold">
+          Meaning:
+        </Typography>
+
+        <Typography variant="body1" color="text.secondary">{word.meaning}</Typography>
+
+        {word.englishMeaning && (
+          <>
+            <Typography sx={{ mt: 2 }} variant="subtitle1" fontWeight="bold">
+              In English:
+            </Typography>
+            <Typography variant="body2">
               {word.englishMeaning}
             </Typography>
-          )}
+          </>
 
-          {word.description && (
-            <Typography variant="body1" sx={{ mt: 2, color: 'text.secondary', lineHeight: 1.6 }}>
+        )}
+
+        {word.description && (
+          <>
+            <Typography sx={{ mt: 2 }} variant="subtitle1" fontWeight="bold">
+              Discription:
+            </Typography>
+            <Typography variant="body1" sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
               {word.description}
             </Typography>
-          )}
+          </>
 
-          <Box sx={{ mt: 3, p: 2, bgcolor: 'divider', borderRadius: 2 }}>
+        )}
 
-            {word.user?.username && (
-              <Typography variant="body2">
-                <strong>Added by:</strong> {word.user.username}
-              </Typography>
-            )}
-          </Box>
-
-          {word.tags && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Tags:</Typography>
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {word.tags.split(' ').map((tag, index) => (
-                  <Chip key={index} label={`#${tag}`} variant="outlined" color="primary" />
-                ))}
-              </Box>
+        {word.tags && (
+          <Box sx={{ mt: 2 }}>
+            <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Tags:</Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+              {word.tags.split(' ').map((tag, index) => (
+                <Chip key={index} label={`#${tag}`} variant="outlined" color="primary" />
+              ))}
             </Box>
-          )}
-        </CardContent>
-      </Card>
+          </Box>
+        )}
+
+        <Box display="flex" justifyContent="space-evenly" p={2}>
+          <Button onClick={() => toggleLike(word)}
+            color="secondary"
+            size="small" sx={{ px: 4 }}
+            startIcon={word.isLiked ? <Favorite /> : <FavoriteBorder />}
+          >
+            Like
+          </Button>
+          <Button onClick={() => toggleSave(word)}
+            color="secondary"
+            size="small"
+            sx={{ px: 4 }}
+            startIcon={word.isSaved ? <Bookmark /> : <BookmarkBorder />}
+          >
+            Save
+          </Button>
+          <Button color="secondary"
+            size="small"
+            startIcon={<Share />}
+            sx={{ px: 4 }}
+          >
+            Share
+          </Button>
+        </Box>
+
+        {word.user?.username && (
+          <Typography variant="body2" sx={{ mt: 2, fontWeight: 'bold' }}>
+            @{word.user.username}
+          </Typography>
+        )}
+
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          {new Date(word.createdAt).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </Typography>
+
+      </Box>
+
+      <Box sx={{ flex: 1, p: 2 }}>
+        <Box sx={{ flex: 1, overflowY: 'auto', maxHeight: '70vh' }}>
+          <Typography variant="body1" color="text.secondary" mt={2}>
+            Comment 1: This is an interesting word!
+          </Typography>
+          <Typography variant="body1" color="text.secondary" mt={2}>
+            Comment 2: I have seen this word used in literature.
+          </Typography>
+          <Typography variant="body1" color="text.secondary" mt={2}>
+            Comment 3: Does this word have multiple meanings?
+          </Typography>
+        </Box>
+
+        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 2 }}>
+          <TextField fullWidth label="Add a comment" variant="outlined" size="small" />
+          <Button variant="contained" color="primary">Post</Button>
+        </Box>
+      </Box>
 
       <Dialog
         open={isDialogOpen}
@@ -301,7 +385,7 @@ const WordDetail: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </>
+    </Container>
   );
 };
 
