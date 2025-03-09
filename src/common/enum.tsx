@@ -1,6 +1,16 @@
-export enum UserRoleType {
-  ADMIN = 1,
-  USER = 2,
-  EDITOR = 3,
-  GUEST = 4,
-}
+const userRoleType = {
+  ADMIN: {
+    name: 'ADMIN', value: 1
+  },
+  USER: {
+    name: 'USER', value: 1
+  },
+  EDITOR: {
+    name: 'EDITOR', value: 1
+  },
+  GUEST: {
+    name: 'GUEST', value: 1
+  }
+};
+
+export { userRoleType };

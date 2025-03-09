@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import EditIcon from '@mui/icons-material/Edit';
+import EditIcon from '@mui/icons-material/EditNote';
 import {
   Box,
   Button,
@@ -20,6 +20,7 @@ import {
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
+import { userRoleType } from '../common/enum';
 import { useAuth } from '../context/AuthContext';
 import { Word } from '../types/Word';
 
@@ -32,13 +33,16 @@ const fetchWord = async (id: number, token: string) => {
 
 const WordDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const { getToken } = useAuth();
+  const { getUser, getToken } = useAuth();
   const [word, setWord] = useState<Word | null>(null);
   const [editedWord, setEditedWord] = useState<Word | null>(null);
   const [isFetching, setIsFetching] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const authToken = getToken();
+  const user = getUser();
+  const canEdit = user?.roles?.some((role: string) =>
+    [userRoleType.ADMIN.name, userRoleType.EDITOR.name].includes(role)
+  );
 
   useEffect(() => {
     const fetch = async () => {
@@ -86,15 +90,17 @@ const WordDetail: React.FC = () => {
         <CardContent>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h4" fontWeight="bold">{word.name}</Typography>
-            <Button
-              color="primary"
-              onClick={handleEditClick}
-              variant="contained"
-              startIcon={<EditIcon />}
-              sx={{ borderRadius: 2, boxShadow: 2 }}
-            >
-              Edit
-            </Button>
+            {canEdit && (
+              <Button
+                color="primary"
+                onClick={handleEditClick}
+                variant="contained"
+                startIcon={<EditIcon />}
+                sx={{ borderRadius: 2, boxShadow: 2 }}
+              >
+                Edit
+              </Button>
+            )}
           </Box>
 
           <Typography variant="h5" color="text.secondary" sx={{ mt: 1 }}>{word.meaning}</Typography>
@@ -137,16 +143,31 @@ const WordDetail: React.FC = () => {
         </CardContent>
       </Card>
 
-      <Dialog open={isDialogOpen} onClose={handleCancelEdit} fullWidth maxWidth="sm">
-        <DialogTitle>Edit Word</DialogTitle>
-        <DialogContent>
+      <Dialog
+        open={isDialogOpen}
+        onClose={handleCancelEdit}
+        fullWidth
+        maxWidth="sm"
+        sx={{
+          '& .MuiDialog-paper': {
+            borderRadius: 3,
+            boxShadow: 6,
+            p: 2,
+          },
+        }}
+      >
+        <DialogTitle sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.5rem' }}>
+          Edit Word
+        </DialogTitle>
+
+        <DialogContent sx={{ maxHeight: '50vh', overflowY: 'auto' }}>
           <TextField
             fullWidth
             variant="outlined"
             label="Word Name"
             value={editedWord?.name || ''}
             onChange={(e) => setEditedWord({ ...editedWord!, name: e.target.value })}
-            sx={{ mt: 2 }}
+            sx={{ mt: 2, mb: 2 }}
           />
 
           <TextField
@@ -155,7 +176,7 @@ const WordDetail: React.FC = () => {
             label="Meaning"
             value={editedWord?.meaning || ''}
             onChange={(e) => setEditedWord({ ...editedWord!, meaning: e.target.value })}
-            sx={{ mt: 2 }}
+            sx={{ mb: 2 }}
           />
 
           <TextField
@@ -164,7 +185,7 @@ const WordDetail: React.FC = () => {
             label="English Meaning"
             value={editedWord?.englishMeaning || ''}
             onChange={(e) => setEditedWord({ ...editedWord!, englishMeaning: e.target.value })}
-            sx={{ mt: 2 }}
+            sx={{ mb: 2 }}
           />
 
           <TextField
@@ -175,25 +196,58 @@ const WordDetail: React.FC = () => {
             label="Description"
             value={editedWord?.description || ''}
             onChange={(e) => setEditedWord({ ...editedWord!, description: e.target.value })}
-            sx={{ mt: 2 }}
+            sx={{ mb: 2 }}
           />
 
-          {/* Tag Editing */}
+          {/* Editable Tags Section */}
           <Box sx={{ mt: 2 }}>
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            <Typography variant="subtitle1" fontWeight="bold">
+              Tags:
+            </Typography>
+
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
               {editedWord?.tags?.split(' ').map((tag, index) => (
-                <Chip key={index} label={`#${tag}`} variant="outlined" />
+                <Chip
+                  key={index}
+                  label={`#${tag}`}
+                  variant="outlined"
+                  onDelete={() => {
+                    const newTags = editedWord.tags.split(' ').filter((t) => t !== tag).join(' ');
+                    setEditedWord({ ...editedWord!, tags: newTags });
+                  }}
+                  sx={{ fontSize: '0.85rem' }}
+                />
               ))}
             </Box>
+
+            <TextField
+              fullWidth
+              variant="outlined"
+              label="Add Tag"
+              placeholder="Type a tag and press Enter"
+              sx={{ mt: 2 }}
+              onKeyDown={(e) => {
+                const target = e.currentTarget as HTMLInputElement; // Type assertion
+                if (e.key === 'Enter' && target.value.trim()) {
+                  const newTags = editedWord?.tags
+                    ? `${editedWord.tags} ${target.value.trim()}`
+                    : target.value.trim();
+
+                  setEditedWord({ ...editedWord!, tags: newTags });
+                  target.value = ''; // Clear input
+                }
+              }}
+            />
           </Box>
         </DialogContent>
 
-        <DialogActions sx={{ justifyContent: 'center', pb: 2 }}>
-          <Button variant="outlined"
+        <DialogActions sx={{ justifyContent: 'center', pb: 2, gap: 2 }}>
+          <Button
+            variant="outlined"
             color="secondary"
             onClick={handleCancelEdit}
             startIcon={<CancelIcon />}
-            sx={{ borderRadius: 2, boxShadow: 2 }}
+            sx={{ borderRadius: 2, boxShadow: 2, px: 4, fontWeight: 'bold' }}
           >
             Cancel
           </Button>
@@ -202,11 +256,15 @@ const WordDetail: React.FC = () => {
             onClick={handleSaveClick}
             variant="contained"
             startIcon={<CheckCircleIcon />}
-            sx={{ borderRadius: 2, boxShadow: 2 }}
+            sx={{
+              borderRadius: 2,
+              boxShadow: 2,
+              px: 4,
+              fontWeight: 'bold',
+            }}
           >
             Save
           </Button>
-
         </DialogActions>
       </Dialog>
     </>
