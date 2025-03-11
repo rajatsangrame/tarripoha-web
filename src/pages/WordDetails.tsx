@@ -32,6 +32,7 @@ import { useParams } from 'react-router-dom';
 import { userRoleType } from '../common/enum';
 import { getLanguageById } from '../common/util';
 import { useAuth } from '../context/AuthContext';
+import { useSnackbarStore } from '../store/snackbarStore';
 import { Word } from '../types/Word';
 
 const fetchWord = async (id: number, token: string) => {
@@ -48,6 +49,8 @@ const WordDetail: React.FC = () => {
   const [editedWord, setEditedWord] = useState<Word | null>(null);
   const [isFetching, setIsFetching] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
+
   const authToken = getToken();
   const user = getUser();
   const canEdit = user?.roles?.some((role: string) =>
@@ -91,11 +94,48 @@ const WordDetail: React.FC = () => {
   }
 
   const toggleLike = async (word: Word) => {
-    //
+
+    try {
+      const newStatus = !word.isLiked;
+      await axios.post(
+        'http://localhost:3001/like/insert-like',
+        {
+          contentId: word.id, contentType: 1, isActive: newStatus,
+        },
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+      setWord({
+        ...word,
+        isLiked: newStatus
+      });
+
+    } catch (error) {
+      showSnackbar(`Fail to update ${error}`, 'error');
+    }
   };
 
   const toggleSave = async (word: Word) => {
-    //
+    try {
+      const newSaveStatus = !word.isSaved;
+      await axios.post(
+        'http://localhost:3001/saved/insert-saved',
+        {
+          contentId: word.id, contentType: 1, isActive: newSaveStatus,
+        },
+        {
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
+      setWord({
+        ...word,
+        isSaved: newSaveStatus
+      });
+      showSnackbar('Updated Saved!');
+    } catch (error) {
+      showSnackbar('Fail update the save', 'error');
+    }
   };
 
   if (!word) {
@@ -215,7 +255,7 @@ const WordDetail: React.FC = () => {
 
         {word.user?.username && (
           <Typography variant="body2" sx={{ mt: 2, fontWeight: 'bold' }}>
-            @{word.user.username}
+            {word.user.firstName} {word.user.lastName} (@{word.user.username})
           </Typography>
         )}
 
