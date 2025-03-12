@@ -221,7 +221,7 @@ const WordDetail: React.FC = () => {
           <Box sx={{ mt: 2 }}>
             <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Tags:</Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-              {word.tags.split(' ').map((tag, index) => (
+              {(JSON.parse(word.tags || '[]') as string[]).map((tag, index) => (
                 <Chip key={index} label={`#${tag}`} variant="outlined" color="primary" />
               ))}
             </Box>
@@ -364,10 +364,11 @@ const WordDetail: React.FC = () => {
                   const newTag = target.value;
 
                   if (newTag) {
-                    const tagsArray = editedWord?.tags ? editedWord.tags.split(' ') : [];
+                    const tagsArray: string[] = JSON.parse(editedWord?.tags || '[]');
                     if (!tagsArray.includes(newTag)) {
+                      tagsArray.push(newTag);
                       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                      setEditedWord({ ...editedWord!, tags: [...tagsArray, newTag].join(' ') });
+                      setEditedWord({ ...editedWord!, tags: JSON.stringify(tagsArray) });
                     }
                     target.value = '';
                   }
@@ -381,19 +382,24 @@ const WordDetail: React.FC = () => {
             />
 
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 1 }}>
-              {editedWord?.tags && editedWord?.tags?.split(' ').map((tag, index) => (
-                <Chip
-                  key={index}
-                  label={`#${tag}`}
-                  variant="outlined"
-                  onDelete={() => {
-                    const newTags = editedWord.tags.split(' ').filter((t) => t !== tag).join(' ');
-                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-                    setEditedWord({ ...editedWord!, tags: newTags });
-                  }}
-                  sx={{ fontSize: '0.85rem' }}
-                />
-              ))}
+              {editedWord?.tags && (
+                (JSON.parse(editedWord?.tags || '[]') as string[]).map(
+                  (tag, index) => (
+                    <Chip
+                      key={index}
+                      label={`#${tag}`}
+                      variant="outlined"
+                      onDelete={() => {
+                        const tagsArray: string[] = JSON.parse(editedWord?.tags || '[]');
+                        const newTags = tagsArray.filter((t) => t !== tag);
+                        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                        setEditedWord({ ...editedWord!, tags: JSON.stringify(newTags) });
+                      }}
+                      sx={{ fontSize: '0.85rem' }}
+                    />
+                  )
+                )
+              )}
             </Box>
 
           </Box>
