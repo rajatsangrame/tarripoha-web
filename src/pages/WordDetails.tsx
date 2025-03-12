@@ -10,10 +10,13 @@ import {
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/EditNote';
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import TagIcon from '@mui/icons-material/Tag';
 import {
+  Avatar,
   Box,
   Button,
+  Card,
   Chip,
   CircularProgress,
   Container,
@@ -21,10 +24,11 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Divider,
+  IconButton,
   InputAdornment,
   OutlinedInput,
-  TextField,
-  Typography,
+  TextField, Typography
 } from '@mui/material';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
@@ -93,6 +97,12 @@ const WordDetail: React.FC = () => {
       </Box>
     );
   }
+
+  const comments = [
+    { id: 1, user: 'Alice', text: 'This is an interesting word!', timestamp: '2h ago' },
+    { id: 2, user: 'Bob', text: 'I have seen this word used in literature.', timestamp: '3h ago' },
+    { id: 3, user: 'Charlie', text: 'Does this word have multiple meanings?', timestamp: '5h ago' },
+  ];
 
   const toggleLike = async (word: Word) => {
     try {
@@ -246,7 +256,9 @@ const WordDetail: React.FC = () => {
           </Box>
         )}
 
-        <Box display="flex" justifyContent="space-evenly" p={2}>
+        <Divider sx={{ mt: 4 }} />
+
+        <Box display="flex" justifyContent="space-evenly" p={1}>
           <Button onClick={() => toggleLike(word)}
             color="secondary"
             size="small" sx={{ px: 4 }}
@@ -287,24 +299,102 @@ const WordDetail: React.FC = () => {
 
       </Box>
 
-      <Box sx={{ flex: 1, p: 2 }}>
-        <Box sx={{ flex: 1, overflowY: 'auto', maxHeight: '70vh' }}>
-          <Typography variant="body1" color="text.secondary" mt={2}>
-            Comment 1: This is an interesting word!
-          </Typography>
-          <Typography variant="body1" color="text.secondary" mt={2}>
-            Comment 2: I have seen this word used in literature.
-          </Typography>
-          <Typography variant="body1" color="text.secondary" mt={2}>
-            Comment 3: Does this word have multiple meanings?
-          </Typography>
+      <Card
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          width: '35%',
+          height: '80%',
+          mx: 4,
+          my: 4,
+          borderRadius: 2,
+          overflow: 'hidden',
+        }}
+      >
+        <Box sx={{ flex: 1, p: 1 }}>
+          {comments.map((comment) => (
+            <Box
+              key={comment.id}
+              sx={{
+                display: 'flex',
+                alignItems: 'flex-start', // Keep avatar at the top
+                mb: 2,
+                p: 1.5,
+                borderRadius: 2,
+                bgcolor: 'background.default',
+              }}
+            >
+              <Avatar
+                sx={{
+                  bgcolor: 'primary.main',
+                  width: 24,
+                  height: 24,
+                  fontSize: 14,
+                  fontWeight: 'bold',
+                  mr: 2,
+                  mt: 0.5,
+                }}
+              >
+                {comment.user.charAt(0)}
+              </Avatar>
+
+              <Box sx={{ flex: 1 }}>
+                <Typography variant="subtitle2" fontWeight="bold">
+                  {comment.user}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  {comment.text}
+                </Typography>
+                <Typography variant="caption" color="text.disabled">
+                  {comment.timestamp}
+                </Typography>
+              </Box>
+
+              <IconButton
+                sx={{
+                  p: 0.5,
+                  alignSelf: 'center',
+                }}
+                color="primary"
+              >
+                <FavoriteBorderIcon fontSize="small" />
+              </IconButton>
+            </Box>
+
+          ))}
         </Box>
 
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 2 }}>
-          <TextField fullWidth label="Add a comment" variant="outlined" size="small" />
-          <Button variant="contained" color="primary">Post</Button>
+        <Divider />
+
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            p: 1,
+            bgcolor: 'background.paper',
+          }}
+        >
+          <TextField
+            fullWidth
+            size="small"
+            placeholder="Write a comment..."
+            variant="outlined"
+            sx={{
+              flex: 1,
+              mr: 1,
+              borderRadius: 2,
+              backgroundColor: 'background.default',
+              '& fieldset': { border: 'none' },
+            }}
+          />
+          <Button
+            color="secondary"
+            size="small" sx={{ px: 1 }}
+          >
+            Send
+          </Button>
         </Box>
-      </Box>
+      </Card>
 
       <Dialog
         open={isDialogOpen}
