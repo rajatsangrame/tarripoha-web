@@ -170,7 +170,7 @@ const WordDetail: React.FC = () => {
           {word.name}
         </Typography>
 
-        <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           {canEdit && (
             <Button
               color="primary"
@@ -184,7 +184,7 @@ const WordDetail: React.FC = () => {
           )}
         </Box>
 
-        {word.language && (
+        {word.languageId && (
           <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box
               sx={{
@@ -216,7 +216,7 @@ const WordDetail: React.FC = () => {
             <Typography sx={{ mt: 2 }} variant="subtitle1" fontWeight="bold">
               In English:
             </Typography>
-            <Typography variant="body2">
+            <Typography variant="body1">
               {word.englishMeaning}
             </Typography>
           </>
@@ -237,7 +237,7 @@ const WordDetail: React.FC = () => {
 
         {word.tags && (
           <Box sx={{ mt: 2 }}>
-            <Typography variant="body2" fontWeight={600} sx={{ mb: 1 }}>Tags:</Typography>
+            <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 1 }}>Tags:</Typography>
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
               {(JSON.parse(word.tags || '[]') as string[]).map((tag, index) => (
                 <Chip key={index} label={`#${tag}`} variant="outlined" color="primary" />
