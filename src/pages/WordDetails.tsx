@@ -33,6 +33,7 @@ import { userRoleType } from '../common/enum';
 import { getLanguageById } from '../common/util';
 import { useAuth } from '../context/AuthContext';
 import { useSnackbarStore } from '../store/snackbarStore';
+import { UpdateWordRequest } from '../types/UpdateWordRequest';
 import { Word } from '../types/Word';
 
 const fetchWord = async (id: number, token: string) => {
@@ -81,8 +82,8 @@ const WordDetail: React.FC = () => {
     setEditedWord(word);
   };
   const handleSaveClick = () => {
+    updateWord();
     setIsDialogOpen(false);
-    console.log('Saving word:', editedWord);
   };
 
   if (isFetching) {
@@ -94,23 +95,17 @@ const WordDetail: React.FC = () => {
   }
 
   const toggleLike = async (word: Word) => {
-
     try {
       const newStatus = !word.isLiked;
       await axios.post(
         'http://localhost:3001/like/insert-like',
-        {
-          contentId: word.id, contentType: 1, isActive: newStatus,
-        },
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
+        { contentId: word.id, contentType: 1, isActive: newStatus },
+        { headers: { Authorization: `Bearer ${authToken}` } }
       );
       setWord({
         ...word,
         isLiked: newStatus
       });
-
     } catch (error) {
       showSnackbar(`Fail to update ${error}`, 'error');
     }
@@ -119,14 +114,9 @@ const WordDetail: React.FC = () => {
   const toggleSave = async (word: Word) => {
     try {
       const newSaveStatus = !word.isSaved;
-      await axios.post(
-        'http://localhost:3001/saved/insert-saved',
-        {
-          contentId: word.id, contentType: 1, isActive: newSaveStatus,
-        },
-        {
-          headers: { Authorization: `Bearer ${authToken}` },
-        }
+      await axios.post('http://localhost:3001/saved/insert-saved',
+        { contentId: word.id, contentType: 1, isActive: newSaveStatus },
+        { headers: { Authorization: `Bearer ${authToken}` } }
       );
       setWord({
         ...word,
@@ -135,6 +125,34 @@ const WordDetail: React.FC = () => {
       showSnackbar('Updated Saved!');
     } catch (error) {
       showSnackbar('Fail update the save', 'error');
+    }
+  };
+
+  const updateWord = async () => {
+    try {
+      if (!editedWord) return;
+      const reqBody: UpdateWordRequest = {
+        name: editedWord.name,
+        meaning: editedWord.meaning,
+        languageId: editedWord.languageId,
+        englishMeaning: editedWord.englishMeaning,
+        description: editedWord.description,
+        tags: editedWord.tags
+      };
+      const response = await axios.put<Word>(
+        `http://localhost:3001/word/update-word/${editedWord.id}`,
+        reqBody,
+        { headers: { Authorization: `Bearer ${authToken}` } }
+      );
+
+      setWord({
+        ...response.data,
+      });
+      setEditedWord({
+        ...response.data,
+      });
+    } catch (error) {
+      showSnackbar(`Fail to update ${error}`, 'error');
     }
   };
 

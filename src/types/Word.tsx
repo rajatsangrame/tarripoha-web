@@ -8,8 +8,8 @@ export interface Word {
   name: string;
   meaning: string;
   tags: string;
-  englishMeaning: string | null;
-  description?: string | null;
+  englishMeaning: string;
+  description?: string;
   isActive: boolean;
   isApproved: boolean;
   isSaved: boolean;
