@@ -39,8 +39,11 @@ import { userRoleType } from '../common/enum';
 import { getLanguageById } from '../common/util';
 import { useAuth } from '../context/AuthContext';
 import { useSnackbarStore } from '../store/snackbarStore';
+import { Comment } from '../types/Comment';
+import { PagingResponse } from '../types/PagingResponse';
 import { createUpdateWordRequest, UpdateWordRequest } from '../types/UpdateWordRequest';
 import { Word } from '../types/Word';
+import { formatTime } from '../utils/utils';
 
 const fetchWord = async (id: number, token: string) => {
   const response = await axios.get<Word>(`http://localhost:3001/word/${id}`, {
@@ -49,11 +52,34 @@ const fetchWord = async (id: number, token: string) => {
   return response.data;
 };
 
+const fetchComments = async (
+  token: string,
+  contentId: number,
+  pageNo = 1,
+  pageSize = 10,
+) => {
+  const response = await axios.get<PagingResponse<Comment>>(
+    'http://localhost:3001/comment/get-comments',
+    {
+      headers: { Authorization: `Bearer ${token}` },
+      params: {
+        contentId,
+        contentType: 1,
+        pageNo,
+        pageSize,
+      },
+    }
+  );
+  return response.data;
+};
+
 const WordDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const { getUser, getToken } = useAuth();
   const [word, setWord] = useState<Word | null>(null);
   const [editedWord, setEditedWord] = useState<Word | null>(null);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [pageNo, setPageNo] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
@@ -89,6 +115,10 @@ const WordDetail: React.FC = () => {
     fetch();
   }, [id]);
 
+  useEffect(() => {
+    refetch();
+  }, [word, pageNo]);
+
   const handleEditClick = () => setIsDialogOpen(true);
   const handleCancelEdit = () => {
     setIsDialogOpen(false);
@@ -106,12 +136,6 @@ const WordDetail: React.FC = () => {
       </Box>
     );
   }
-
-  const comments = [
-    { id: 1, user: 'Alice', text: 'This is an interesting word!', timestamp: '2h ago' },
-    { id: 2, user: 'Bob', text: 'I have seen this word used in literature.', timestamp: '3h ago' },
-    { id: 3, user: 'Charlie', text: 'Does this word have multiple meanings?', timestamp: '5h ago' },
-  ];
 
   const toggleLike = async (word: Word) => {
     try {
@@ -167,6 +191,13 @@ const WordDetail: React.FC = () => {
       resetEditWord();
       showSnackbar(`Fail to update ${error}`, 'error');
     }
+  };
+
+  const refetch = async () => {
+    if (!pageNo || !word || !authToken) return null;
+    const reponse: PagingResponse<Comment> = await fetchComments(authToken, word.id, pageNo);
+    const newComments = reponse.data;
+    setComments([...comments, ...newComments]);
   };
 
   if (!word) {
@@ -349,18 +380,18 @@ const WordDetail: React.FC = () => {
                   mt: 0.5,
                 }}
               >
-                {comment.user.charAt(0)}
+                {comment.user.firstName.charAt(0)}
               </Avatar>
 
               <Box sx={{ flex: 1 }}>
                 <Typography variant="subtitle2" fontWeight="bold">
-                  {comment.user}
+                  {comment.user.firstName} {comment.user.lastName} (@{comment.user.username})
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                   {comment.text}
                 </Typography>
                 <Typography variant="caption" color="text.disabled">
-                  {comment.timestamp}
+                  {formatTime(comment.createdAt)}
                 </Typography>
               </Box>
 
