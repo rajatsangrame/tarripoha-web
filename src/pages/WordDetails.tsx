@@ -17,6 +17,7 @@ import {
   Box,
   Button,
   Card,
+  Checkbox,
   Chip,
   CircularProgress,
   Container,
@@ -25,6 +26,7 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  FormControlLabel,
   IconButton,
   InputAdornment,
   OutlinedInput,
@@ -37,7 +39,7 @@ import { userRoleType } from '../common/enum';
 import { getLanguageById } from '../common/util';
 import { useAuth } from '../context/AuthContext';
 import { useSnackbarStore } from '../store/snackbarStore';
-import { UpdateWordRequest } from '../types/UpdateWordRequest';
+import { createUpdateWordRequest, UpdateWordRequest } from '../types/UpdateWordRequest';
 import { Word } from '../types/Word';
 
 const fetchWord = async (id: number, token: string) => {
@@ -62,6 +64,13 @@ const WordDetail: React.FC = () => {
     [userRoleType.ADMIN.name, userRoleType.EDITOR.name].includes(role)
   );
 
+  const resetEditWord = () => {
+    // Reset the Edit word in update
+    if (editedWord && word) {
+      setEditedWord(word);
+    }
+  };
+
   useEffect(() => {
     const fetch = async () => {
       const wordId = Number(id);
@@ -83,7 +92,7 @@ const WordDetail: React.FC = () => {
   const handleEditClick = () => setIsDialogOpen(true);
   const handleCancelEdit = () => {
     setIsDialogOpen(false);
-    setEditedWord(word);
+    resetEditWord();
   };
   const handleSaveClick = () => {
     updateWord();
@@ -141,14 +150,7 @@ const WordDetail: React.FC = () => {
   const updateWord = async () => {
     try {
       if (!editedWord) return;
-      const reqBody: UpdateWordRequest = {
-        name: editedWord.name,
-        meaning: editedWord.meaning,
-        languageId: editedWord.languageId,
-        englishMeaning: editedWord.englishMeaning,
-        description: editedWord.description,
-        tags: editedWord.tags
-      };
+      const reqBody: UpdateWordRequest = createUpdateWordRequest(editedWord);
       const response = await axios.put<Word>(
         `http://localhost:3001/word/update-word/${editedWord.id}`,
         reqBody,
@@ -162,12 +164,13 @@ const WordDetail: React.FC = () => {
         ...response.data,
       });
     } catch (error) {
+      resetEditWord();
       showSnackbar(`Fail to update ${error}`, 'error');
     }
   };
 
   if (!word) {
-    return <Typography variant="h6" textAlign="center">Word not found.</Typography>;
+    return <Typography variant="h5" textAlign="center" sx={{ margin: 4 }}>Word not found.</Typography>;
   }
 
   return (
@@ -180,38 +183,49 @@ const WordDetail: React.FC = () => {
           {word.name}
         </Typography>
 
-        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          {canEdit && (
+        <Box sx={{ mt: 4, display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Box
+            sx={{
+              top: 8,
+              right: 8,
+              backgroundColor: 'divider',
+              px: 1.5,
+              py: 0.5,
+              borderRadius: 2,
+              fontWeight: 'bold',
+            }}
+          >
+            {getLanguageById(word.languageId)?.value}
+          </Box>
+        </Box>
+
+        {canEdit && (
+          <Box sx={{ mt: 2, display: 'flex', justifyContent: 'left', alignItems: 'center' }}>
+            <Box
+              sx={{
+                top: 8,
+                right: 8,
+                backgroundColor: word.isActive ? 'green' : 'red',
+                color: 'whitesmoke',
+                px: 2,
+                py: 0.9,
+                borderRadius: 2,
+                fontWeight: 'bold',
+              }}
+            >
+              {word.isActive ? 'Active' : 'Inactive'}
+            </Box>
+
             <Button
               color="primary"
               onClick={handleEditClick}
               variant="contained"
               startIcon={<EditIcon />}
-              sx={{ borderRadius: 2, boxShadow: 2 }}
+              sx={{ marginLeft: 2, borderRadius: 2, boxShadow: 2 }}
             >
               Edit
             </Button>
-          )}
-        </Box>
 
-        {word.languageId && (
-          <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
-              sx={{
-                top: 8,
-                right: 8,
-                backgroundColor: 'divider',
-                px: 1.5,
-                py: 0.5,
-                borderRadius: 2,
-                fontWeight: 'bold',
-              }}
-            >
-              {getLanguageById(word.languageId)?.symbol}
-            </Box>
-            <Typography variant="body1" color="text.secondary">
-              {getLanguageById(word.languageId)?.value}
-            </Typography>
           </Box>
         )}
 
@@ -317,7 +331,7 @@ const WordDetail: React.FC = () => {
               key={comment.id}
               sx={{
                 display: 'flex',
-                alignItems: 'flex-start', // Keep avatar at the top
+                alignItems: 'flex-start',
                 mb: 2,
                 p: 1.5,
                 borderRadius: 2,
@@ -456,6 +470,34 @@ const WordDetail: React.FC = () => {
             sx={{ mb: 2 }}
           />
 
+          <Box display="flex" justifyContent="left" alignItems="center">
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={editedWord?.isApproved || false}
+                  onChange={(e) =>
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    setEditedWord({ ...editedWord!, isApproved: e.target.checked })
+                  }
+                />
+              }
+              label="Approved"
+            />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={editedWord?.isActive || false}
+                  onChange={(e) =>
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                    setEditedWord({ ...editedWord!, isActive: e.target.checked })
+                  }
+                />
+              }
+              label="Active"
+            />
+          </Box>
+
           <Box sx={{ mt: 2 }}>
             <Typography variant="subtitle1" fontWeight="bold">
               Tags:
@@ -539,7 +581,7 @@ const WordDetail: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Container>
+    </Container >
   );
 };
 
