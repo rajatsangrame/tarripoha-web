@@ -10,7 +10,6 @@ import {
 import CancelIcon from '@mui/icons-material/Cancel';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import EditIcon from '@mui/icons-material/EditNote';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import TagIcon from '@mui/icons-material/Tag';
 import {
   Avatar,
@@ -137,20 +136,28 @@ const WordDetail: React.FC = () => {
     );
   }
 
-  const toggleLike = async (word: Word) => {
+  const toggleLike = async (contentId: number, contentType: number, currentLikeStatus: boolean) => {
     try {
-      const newStatus = !word.isLiked;
+      const newStatus = !currentLikeStatus;
       await axios.post(
         'http://localhost:3001/like/insert-like',
-        { contentId: word.id, contentType: 1, isActive: newStatus },
+        { contentId, contentType, isActive: newStatus },
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
-      setWord({
-        ...word,
-        isLiked: newStatus
-      });
+
+      if (contentType === 1) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        setWord({ ...word!, isLiked: newStatus });
+
+      } else if (contentType === 2) {
+        setComments((prevComments) =>
+          prevComments.map((comment) =>
+            comment.id === contentId ? { ...comment, isLiked: newStatus } : comment
+          )
+        );
+      }
     } catch (error) {
-      showSnackbar(`Fail to update ${error}`, 'error');
+      showSnackbar(`Failed to update like status: ${error}`, 'error');
     }
   };
 
@@ -304,7 +311,7 @@ const WordDetail: React.FC = () => {
         <Divider sx={{ mt: 4 }} />
 
         <Box display="flex" justifyContent="space-evenly" p={1}>
-          <Button onClick={() => toggleLike(word)}
+          <Button onClick={() => toggleLike(word.id, 1, word.isLiked)}
             color="secondary"
             size="small" sx={{ px: 4 }}
             startIcon={word.isLiked ? <Favorite /> : <FavoriteBorder />}
@@ -356,7 +363,7 @@ const WordDetail: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        <Box sx={{ flex: 1, p: 1 }}>
+        <Box sx={{ flex: 1, p: 1.5, }}>
           {comments.map((comment) => (
             <Box
               key={comment.id}
@@ -367,6 +374,7 @@ const WordDetail: React.FC = () => {
                 p: 1.5,
                 borderRadius: 2,
                 bgcolor: 'background.default',
+
               }}
             >
               <Avatar
@@ -402,7 +410,7 @@ const WordDetail: React.FC = () => {
                 }}
                 color="primary"
               >
-                <FavoriteBorderIcon fontSize="small" />
+                {comment.isLiked ? <Favorite fontSize="small" /> : <FavoriteBorder fontSize="small" />}
               </IconButton>
             </Box>
 

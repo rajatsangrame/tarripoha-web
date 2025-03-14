@@ -4,7 +4,7 @@ const createCustomTheme = (mode: 'light' | 'dark') => {
 
   const light = {
     background: {
-      default: '#fff',
+      default: '#F5F5F5',
       paper: '#fff',
     },
     text: {
