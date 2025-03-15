@@ -8,6 +8,7 @@ export interface Comment {
   contentType: number;
   isActive: boolean;
   isLiked: boolean;
+  totalLikes: number;
   createdAt: string;
   updatedAt: string;
   user: User;

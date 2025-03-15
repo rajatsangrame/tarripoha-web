@@ -442,7 +442,7 @@ const WordDetail: React.FC = () => {
                       <IconButton onClick={() => toggleLike(comment.id, 2, comment.isLiked)} sx={{ p: 0.5, ml: -0.5 }} color="primary">
                         {comment.isLiked ? <Favorite fontSize="small" /> : <FavoriteBorder fontSize="small" />}
                       </IconButton>
-                      <Typography variant="body2" color="text.secondary">{1 || 0}</Typography>
+                      <Typography variant="body2" color="text.secondary">{comment.totalLikes || ''}</Typography>
                     </Box>
                   </Box>
 
