@@ -39,6 +39,7 @@ import { getLanguageById } from '../common/util';
 import { useAuth } from '../context/AuthContext';
 import { useSnackbarStore } from '../store/snackbarStore';
 import { Comment } from '../types/Comment';
+import { InsertComment } from '../types/InsertComment';
 import { PagingResponse } from '../types/PagingResponse';
 import { createUpdateWordRequest, UpdateWordRequest } from '../types/UpdateWordRequest';
 import { Word } from '../types/Word';
@@ -81,6 +82,7 @@ const WordDetail: React.FC = () => {
   const [pageNo, setPageNo] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [commentText, setCommentText] = useState('');
   const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
 
   const authToken = getToken();
@@ -115,7 +117,7 @@ const WordDetail: React.FC = () => {
   }, [id]);
 
   useEffect(() => {
-    refetch();
+    refetchComments();
   }, [word, pageNo]);
 
   const handleEditClick = () => setIsDialogOpen(true);
@@ -126,6 +128,20 @@ const WordDetail: React.FC = () => {
   const handleSaveClick = () => {
     updateWord();
     setIsDialogOpen(false);
+  };
+
+  const handleInsertComment = async () => {
+    if (!commentText.trim() || !word) {
+      return;
+    }
+
+    const payload: InsertComment = {
+      text: commentText,
+      contentId: word.id,
+      contentType: 1,
+    };
+    await insertComment(payload);
+    setCommentText('');
   };
 
   if (isFetching) {
@@ -200,11 +216,30 @@ const WordDetail: React.FC = () => {
     }
   };
 
-  const refetch = async () => {
+  const insertComment = async (payload: InsertComment) => {
+    try {
+
+      await axios.post('http://localhost:3001/comment/insert-comment',
+        payload,
+        { headers: { Authorization: `Bearer ${authToken}` } }
+      );
+      refetchComments();
+      showSnackbar('Comment Added!');
+    } catch (error) {
+      showSnackbar('Fail update the save', 'error');
+    }
+  };
+
+  const refetchComments = async () => {
     if (!pageNo || !word || !authToken) return null;
     const reponse: PagingResponse<Comment> = await fetchComments(authToken, word.id, pageNo);
     const newComments = reponse.data;
-    setComments([...comments, ...newComments]);
+    setComments((prevComments) => {
+      const existingIds = new Set(prevComments.map((c) => c.id));
+      const uniqueNewComments = newComments.filter((c) => !existingIds.has(c.id));
+
+      return [...prevComments, ...uniqueNewComments];
+    });
   };
 
   if (!word) {
@@ -363,58 +398,71 @@ const WordDetail: React.FC = () => {
           overflow: 'hidden',
         }}
       >
-        <Box sx={{ flex: 1, p: 1.5, }}>
-          {comments.map((comment) => (
-            <Box
-              key={comment.id}
-              sx={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                mb: 2,
-                p: 1.5,
-                borderRadius: 2,
-                bgcolor: 'background.default',
+        <Box sx={{ flex: 1, p: 1.5, overflowY: 'auto' }}>
+          {comments.length > 0 ? (
+            comments.map((comment) => (
+              <Box
+                key={comment.id}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  mb: 2,
+                  p: 1.5,
+                  borderRadius: 2,
+                  border: 1,
+                  borderColor: 'grey.300',
+                  bgcolor: 'background.default',
+                }}
+              >
+                <Avatar
+                  sx={{
+                    bgcolor: 'primary.main',
+                    width: 24,
+                    height: 24,
+                    fontSize: 14,
+                    fontWeight: 'bold',
+                    mr: 2,
+                    mt: 0.5,
+                  }}
+                >
+                  {comment.user.firstName.charAt(0)}
+                </Avatar>
 
+                <Box sx={{ flex: 1 }}>
+                  <Typography variant="subtitle2" fontWeight="bold">
+                    {comment.user.firstName} {comment.user.lastName} (@{comment.user.username})
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {comment.text}
+                  </Typography>
+                  <Typography variant="caption" color="text.disabled">
+                    {formatTime(comment.createdAt)}
+                  </Typography>
+                </Box>
+
+                <IconButton
+                  onClick={() => toggleLike(comment.id, 2, comment.isLiked)}
+                  sx={{ p: 0.5, alignSelf: 'center' }} color="primary">
+                  {comment.isLiked ? <Favorite fontSize="small" /> : <FavoriteBorder fontSize="small" />}
+                </IconButton>
+              </Box>
+            ))
+          ) : (
+            <Box
+              sx={{
+                textAlign: 'center',
+                py: 3,
+                borderRadius: 2,
+                border: 1,
+                borderColor: 'grey.300',
+                bgcolor: 'background.paper',
               }}
             >
-              <Avatar
-                sx={{
-                  bgcolor: 'primary.main',
-                  width: 24,
-                  height: 24,
-                  fontSize: 14,
-                  fontWeight: 'bold',
-                  mr: 2,
-                  mt: 0.5,
-                }}
-              >
-                {comment.user.firstName.charAt(0)}
-              </Avatar>
-
-              <Box sx={{ flex: 1 }}>
-                <Typography variant="subtitle2" fontWeight="bold">
-                  {comment.user.firstName} {comment.user.lastName} (@{comment.user.username})
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {comment.text}
-                </Typography>
-                <Typography variant="caption" color="text.disabled">
-                  {formatTime(comment.createdAt)}
-                </Typography>
-              </Box>
-
-              <IconButton
-                sx={{
-                  p: 0.5,
-                  alignSelf: 'center',
-                }}
-                color="primary"
-              >
-                {comment.isLiked ? <Favorite fontSize="small" /> : <FavoriteBorder fontSize="small" />}
-              </IconButton>
+              <Typography variant="body1" color="text.secondary">
+                No comments yet.
+              </Typography>
             </Box>
-
-          ))}
+          )}
         </Box>
 
         <Divider />
@@ -428,10 +476,6 @@ const WordDetail: React.FC = () => {
           }}
         >
           <TextField
-            fullWidth
-            size="small"
-            placeholder="Write a comment..."
-            variant="outlined"
             sx={{
               flex: 1,
               mr: 1,
@@ -439,8 +483,23 @@ const WordDetail: React.FC = () => {
               backgroundColor: 'background.default',
               '& fieldset': { border: 'none' },
             }}
+            fullWidth
+            size="small"
+            placeholder="Write a comment..."
+            variant="outlined"
+            value={commentText}
+            onChange={(e) => setCommentText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Prevents new line in input
+                handleInsertComment();
+              }
+            }}
+
           />
           <Button
+            onClick={handleInsertComment}
+            disabled={!commentText.trim()}
             color="secondary"
             size="small" sx={{ px: 1 }}
           >
