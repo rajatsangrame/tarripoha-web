@@ -5,19 +5,19 @@ function formatTime(timestamp: string): string {
   const now = moment();
 
   if (now.diff(date, 'seconds') < 60) {
-    return `${now.diff(date, 'seconds')} seconds ago`;
+    return `${now.diff(date, 'seconds')} sec`;
   }
 
   if (now.diff(date, 'minutes') < 60) {
-    return `${now.diff(date, 'minutes')} minutes ago`;
+    return `${now.diff(date, 'minutes')} min`;
   }
 
   if (now.diff(date, 'hours') < 24) {
-    return `${now.diff(date, 'hours')} hours ago`;
+    return `${now.diff(date, 'hours')} hr`;
   }
 
   if (now.diff(date, 'days') === 1) {
-    return 'Yesterday';
+    return 'yesterday';
   }
 
   return date.format('YYYY-MM-DD');
