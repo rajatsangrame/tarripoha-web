@@ -6,6 +6,7 @@ import {
   Favorite,
   FavoriteBorder,
   MoreHoriz,
+  ReplayRounded,
   Share,
 } from '@mui/icons-material';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -83,6 +84,7 @@ const WordDetail: React.FC = () => {
   const [comments, setComments] = useState<PagingResponse<Comment> | null>(null);
   const [commentsPageNo, setCommentsPageNo] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
+  const [isLodeMore, setIsLodeMore] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [commentText, setCommentText] = useState('');
   const showSnackbar = useSnackbarStore((state) => state.showSnackbar);
@@ -239,7 +241,9 @@ const WordDetail: React.FC = () => {
 
   const refetchComments = async () => {
     if (!commentsPageNo || !word || !authToken) return null;
+    setIsLodeMore(true);
     const reponse: PagingResponse<Comment> = await fetchComments(authToken, word.id, commentsPageNo);
+    setIsLodeMore(false);
     const newComments = reponse.data;
     setComments((prevComments) => {
       if (!prevComments) return reponse;
@@ -448,10 +452,17 @@ const WordDetail: React.FC = () => {
                 </Box>
               ))}
 
-              {comments.total > comments.pageNo * comments.pageSize && (
-                <Button onClick={() => setCommentsPageNo(comments.pageNo + 1)} variant="outlined" sx={{ mt: 2, alignSelf: 'center' }}>
-                  Load More
-                </Button>
+              {comments.total > comments.data.length && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                  <Button onClick={() => setCommentsPageNo((prev) => prev + 1)}
+                    color="secondary"
+                    variant="outlined"
+                    size="small" sx={{ px: 4, textTransform: 'none' }}
+                    startIcon={<ReplayRounded />}
+                  >
+                    {isLodeMore ? <CircularProgress size={18} sx={{ color: 'primary.main' }} /> : 'Load more comments'}
+                  </Button>
+                </Box>
               )}
             </>
           ) : (
