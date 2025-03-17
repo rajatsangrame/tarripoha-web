@@ -36,7 +36,7 @@ import {
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
-import { userRoleType } from '../common/enum';
+import { CONTENT_TYPE, USER_ROLE_TYPE } from '../common/enum';
 import { getLanguageById } from '../common/util';
 import { useAuth } from '../context/AuthContext';
 import { useSnackbarStore } from '../store/snackbarStore';
@@ -92,7 +92,7 @@ const WordDetail: React.FC = () => {
   const authToken = getToken();
   const user = getUser();
   const canEdit = user?.roles?.some((role: string) =>
-    [userRoleType.ADMIN.name, userRoleType.EDITOR.name].includes(role)
+    [USER_ROLE_TYPE.ADMIN.name, USER_ROLE_TYPE.EDITOR.name].includes(role)
   );
 
   const resetEditWord = () => {
@@ -159,23 +159,24 @@ const WordDetail: React.FC = () => {
   const toggleLike = async (contentId: number, contentType: number, currentLikeStatus: boolean) => {
     try {
       const newStatus = !currentLikeStatus;
-      await axios.post(
+      const response = await axios.post(
         'http://localhost:3001/like/insert-like',
         { contentId, contentType, isActive: newStatus },
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
 
-      if (contentType === 1) {
+      const { isActive, totalLikes } = response.data;
+      if (contentType === CONTENT_TYPE.WORD.value) {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         setWord({ ...word!, isLiked: newStatus });
 
-      } else if (contentType === 2) {
+      } else if (contentType === CONTENT_TYPE.COMMENT.value) {
         setComments((prevComments) =>
           prevComments
             ? {
               ...prevComments,
               data: prevComments.data.map((comment) =>
-                comment.id === contentId ? { ...comment, isLiked: newStatus } : comment
+                comment.id === contentId ? { ...comment, isLiked: isActive, totalLikes } : comment
               ),
             }
             : null

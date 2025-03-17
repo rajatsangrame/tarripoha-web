@@ -10,6 +10,7 @@ import {
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+import { CONTENT_TYPE } from '../common/enum';
 import RequireLogin from '../component/RequireLogin';
 import WordGrid from '../component/Word';
 import { useAuth } from '../context/AuthContext';
@@ -22,12 +23,13 @@ const fetchSavedWords = async (
   pageSize: number,
   pageNo?: number
 ) => {
+  const contentType = CONTENT_TYPE.WORD.value;
   const response = await axios.get<PagingResponse<Word>>(
     'http://localhost:3001/saved/get-saved',
     {
       headers: { Authorization: `Bearer ${token}` },
       params: {
-        contentType: 1,
+        contentType,
         pageNo,
         pageSize,
       },
@@ -69,10 +71,11 @@ export default function Saved() {
   const toggleLike = async (word: Word) => {
     try {
       const newStatus = !word.isLiked;
+      const contentType = CONTENT_TYPE.WORD.value;
       await axios.post(
         'http://localhost:3001/like/insert-like',
         {
-          contentId: word.id, contentType: 1, isActive: newStatus,
+          contentId: word.id, contentType, isActive: newStatus,
         },
         {
           headers: { Authorization: `Bearer ${authToken}` },
